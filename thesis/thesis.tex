@@ -1,0 +1,81 @@
+\newcommand{\dir}{../preface}
+
+%========================= PREFACE ========================= 
+\ifthenelse{\boolean{edthesis}}
+ {
+   \begin{prefacepart}
+   \pagenumbering{roman} 
+}
+{
+  \frontmatter
+}
+
+\input{\dir/title}
+\input{\dir/declaration.tex}
+\chapter{Abstract}
+\markboth{\MakeUppercase{Abstract}}{\MakeUppercase{Abstract}}
+\input{\dir/abstract.tex}
+\input{\dir/acknowledgements.tex}
+
+{\setlength{\parskip}{0ex plus 0.5ex minus 0.2ex}
+
+\ifthenelse{\boolean{edthesis}}
+ {
+  \begin{singlespace}
+ }{}
+
+\tableofcontents
+\listoftables
+\listoffigures
+% Glossary stuff
+%\input{\dir/glossary.tex}
+%\cleardoublepage
+%\renewcommand{\nomname}{List of Symbols}
+%\markboth{\MakeUppercase{\nomname}}{\MakeUppercase{\nomname}}
+%\addcontentsline{toc}{chapter}{List of Symbols}
+%\printglossary
+\ifthenelse{\boolean{edthesis}}
+ {
+  \end{singlespace}
+ }{}
+}
+
+\ifthenelse{\boolean{edthesis}}
+ {
+   \end{prefacepart}
+   \pagenumbering{arabic} 
+}
+{
+   \mainmatter
+}
+%========================= CHAPTERS ========================= 
+\renewcommand{\dir}{../chapter1/chapter/}
+\input{\dir/chapter1.tex}
+\renewcommand{\dir}{../chapter2/chapter/}
+\input{\dir/chapter2.tex}
+
+%========================= Appendix ========================= 
+\renewcommand{\chaptermark}[1]{%
+ \markboth{\MakeUppercase{%
+ \appendixname} \ \thechapter.%
+ \ #1}{}}
+%\renewcommand{\dir}{../appendix/appendix}
+%\input{\dir/appendix.tex}
+
+%========================= BIBLIOGRAPHY ========================= 
+\ifthenelse{\boolean{edthesis}}
+ {
+ \begin{singlespace}
+}
+{
+  \backmatter
+}
+%\def\bibname{References}
+%\tocotherhead{References}
+%\addcontentsline{toc}{chapter}{References}
+%\bibliography{ism}
+\ifthenelse{\boolean{edthesis}}
+ {
+  \end{singlespace}
+ }{}
+
