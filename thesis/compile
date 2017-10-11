@@ -1,0 +1,3 @@
+pdflatex -shell-escape ed_thesis.tex
+bibtex ed_thesis.aux
+pdflatex -shell-escape ed_thesis.tex

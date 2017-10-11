@@ -53,6 +53,8 @@
 \input{\dir/chapter1.tex}
 \renewcommand{\dir}{../chapter2/chapter/}
 \input{\dir/chapter2.tex}
+\renewcommand{\dir}{../chapter3/chapter/}
+\input{\dir/chapter3.tex}
 
 %========================= Appendix ========================= 
 \renewcommand{\chaptermark}[1]{%
@@ -70,10 +72,10 @@
 {
   \backmatter
 }
-%\def\bibname{References}
-%\tocotherhead{References}
-%\addcontentsline{toc}{chapter}{References}
-%\bibliography{ism}
+\def\bibname{References}
+% \tocotherhead{References}
+% \addcontentsline{toc}{chapter}{References}
+\bibliography{../bibliography/lmcarvalho_PhD_Thesis}
 \ifthenelse{\boolean{edthesis}}
  {
   \end{singlespace}

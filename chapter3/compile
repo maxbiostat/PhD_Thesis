@@ -1,0 +1,4 @@
+
+pdflatex -shell-escape luiz_PhD_chapter_three.tex
+bibtex luiz_PhD_chapter_three.aux
+pdflatex -shell-escape luiz_PhD_chapter_three.tex

@@ -1,0 +1,143 @@
+\chapter{Convergence diagnostics for Markov Chain Monte Carlo in Bayesian phylogenetics: the case of time-trees}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivation}
+\label{sec:intro}
+
+Markov chain Monte Carlo (MCMC) methods have become a standard tool for approximating complex posterior distributions encountered in Bayesian inference~\citep{Robert2011}.
+In phylogenetics, most if not all Bayesian approaches rely on MCMC for approximating the posterior distribution of trees~\citep{Li2000,Suchard2001,Huelsenbeck2001b}.
+These methods rely on constructing a Markov chain whose stationary distribution is the (target) distribution one wishes to sample from.
+A fundamental issue is to determine when the chain has reached stationarity and samples are being drawn from the target distribution.
+Whilst much attention has been given to this issue in the statistical literature, most diagnostic methods assume univariate, continuous parameter spaces.
+Discrete, high-dimensional parameter spaces such as those encountered in phylogenetics pose additional challenges to development of effective convergence diagnostic tools.
+
+Available methods for diagnosing convergence of MCMC for Bayesian phylogenetics include tracking clade (split) frequencies both within and between chains~\citep{Nylander2004}, multi-dimensional scaling of tree distance matrices~\cite{Hillis2005,Matsen2006} and network-based clustering~\citep{Whidden2015}. 
+These methods are mostly graphical in nature, and only recently have more formal convergence metrics been proposed~\citep{Whidden2015,Lanfear2016}.
+
+An important thing to notice is that it is not possible to say with complete certainty when a Markov chain has converged to its target distribution.
+Rather, convergence tools are designed to identify failure to converge.
+As argued by~\cite{Mossel2005}, when the data do not conform with the model (e.g., come from a mixture of trees rather than a single tree) apparent convergence can be misleading.
+\cite{Cowles1996} and~\cite{Brooks1998} further reinforce the point that multiple convergence diagnostics need to be employed in order to mitigate the risk of determining convergence when in fact chains have not reached the desired target.
+Thus, no single method or tool is likely to supersede all the others, as there are cases where one method fails to detect problems but others identify failure to converge. 
+Successful application of convergence detection tools fundamentally depends on combining several metrics/tools in one coherent framework~(e.g. the approaches of~\cite{Nylander2004} and~\cite{Lanfear2016}).
+
+An additional issue with currently available methods is that most assume either unrooted trees and/or contemporaneous sequences, limiting their applicability in cases where one deals with time-calibrated phylogenies, or time-trees (see below).
+\cite{Warren2017} attempt to integrate most of the popular visualisation methods, along with some quantitative indicators, into one framework.
+My goal here is to expand upon their approach and make the necessary adaptations to accommodate time-calibrated trees with hundreds of taxa.
+In what follows I review  some key concepts in Bayesian phylogenetics as well as the state-of-the-art for convergence diagnostics in phylogenetic MCMC.
+I then proceed on to discussing the limitations of available methods when dealing with time-calibrated trees and suggest adaptations.
+
+\subsection{Time-tree space}
+\label{sec:ttspace}
+
+To understand the challenges of assessing convergence of phylogenetic MCMC, it is desirable to describe the parameter space which it attempts to explore.
+First, it is convenient to define some notation.
+Let $t \in \mathbb{T}$ be a binary rooted tree on $n$ taxa (leaves), with $2n-3$ edges.
+Each of the edges in $t$ can associated with a unique node numbering.
+We can supplement $t$ with a set of branch lengths $\boldsymbol b = \{b_1, b_2, \ldots, b_{2n-3} \}$, $\boldsymbol b \in \boldsymbol B \subseteq \mathbb{R}_{+}^{2n-3}$.
+Denote the object $(t, \boldsymbol b) = \tau \in \boldsymbol\Psi$. 
+For convenience, we will henceforth call $t$ a \textbf{topology} and $\tau$ a \textbf{tree}.
+We will also use the terms tree and phylogeny interchangeably.
+
+The first important thing to notice is that while $\mathbb{T}$ is discrete and finite (despite 
+
+Throughout this paper we will use $\boldsymbol\Psi$ to denote the parameter space encompassing topologies and branch lengths, henceforth called ``tree space'', and $\tau \in \boldsymbol\Psi$ to denote a bifurcating, rooted tree with branch lengths on  $n$ taxa.
+
+
+An striking feature of the space of phylogenetic trees is its sheer size.
+A well-known counting argument shows that there are $ |\mathbb{T}| = 1 \times 3 \times \ldots \times (2n-5) \times (2n-3) = (2n-3)!!$ binary rooted phylogenies on $n \geq 3$ taxa.
+In her review of the geometry of tree space, \cite{StJohn2017} argues that the power of the tree model ``comes from the property that adds the complexity: the vast number of trees to explain different possible evolutionary scenarios'' (pg e83).
+
+
+As argued by~\cite{Drummond2015}, the complexity of tree space can be seen as a major reason for the development of specialised software for Bayesian phylogenetics as opposed to the use of common MCMC packages such as Stan and JAGS. 
+
+An useful way of representing discrete tree space is equipping it with a metric and construct a graph $G_\delta(V, E)$ where each tree corresponds to a topology and there is an edge between two edges (trees) if they are a distance $d \leq \delta$ apart under the chosen metric.
+
+\subsection{Tree metrics}
+\label{sec:metrics}
+
+\cite{Kendall2016} proposed a new metric based on ...
+
+\subsection{MDS}
+\label{sec:MDS}
+
+\cite{Hillis2005}
+
+\cite{Jombart2017} developed an R package to aid MDS visualisation under diffent metrics, with special focus on the KC metric~\citep{Kendall2016}.
+
+\section{Convergence of continuous parameters}
+REVIEW basics (PSRF, Gweke, etc) + ESS
+
+\section{Convergence in tree space}
+\label{sec:treespace}
+
+
+\subsection{Clade frequencies}
+\label{sec:awty}
+
+The approach of~\cite{Nylander2004} is to analyse clade/split frequencies to assess convergence of MCMC in a phylogenetic space.
+The program AWTY (short for ``are we there yet?'') provides graphical facilities for assessing convergence by analysing various aspects of the distribution of sampled clades.
+Most of the diagnostic plots rely on two independent chains.
+
+By plotting clade frequencies estimated in two independent chains against each other (scatterplot), one can assess whether both chains have converged to similar distributions.
+Lack of convergence can be detected when points fall away from the identity ($x = y$) line.
+For a single chain, one useful diagnostic is plotting cumulative clade frequencies along the chain.
+If these trajectories present long-term trends, it means clade frequencies have not stabilised, indicating lack of convergence.
+
+Absence-presence plots show whether a particular clade was absent or present in the tree sampled at each iteration of the chain.
+If there are long periods where the clade is either absent or present, this indicates the chain has not mixed well and might not have converged.
+On the other hand, a traceplot of this kind where the indicator variable frequently switches between $0$ and $1$ indicates good mixing.
+This notion of ``clade-switching'' can be made more precise (see below).
+
+Finally, one can also plot the distance 
+
+
+A modern incarnation of AWTY, RWTY~\citep{Warren2017} seeks ...
+
+How do clade frequencies relate to distance to true tree (for simulated data)?
+Explore Figure 4 in~\cite{Lakner2008}: can we link ESS, clade frequencies and MDS?
+
+Let $\boldsymbol X_i = \{X^{(1)}, X^{(2)}, \ldots, X^{(n)}\} \in [0, 1]^n$ be a collection of samples from a Markov chain such that $X^{(j)}_i = 1$ if clade $i$ was sampled in the $j$-th iteration and $0$ otherwise.
+Also, for $s_i = \sum_k X_i^{(k)}$ we call $f_i = s_i/n$ the \textit{frequency} of clade $i$.
+
+\subsection{Clade switching}
+
+Let $m_i = \min(n - s_i, s_i)$, it can be shown that the maximum number of transitions that can be observed from $\boldsymbol X_i$ is either $J_i = 2 m_i$\footnote{Technically, $J_i$ depends on the first state $X_i^{(1)}$.
+Suppose w.l.o.g. that $m_i = s_i$.
+Then $J_i = 2 m_i - 1$ if $X_i^{(1)} = 1$ and $J_i = 2 m_i$ otherwise.}.
+
+Let $\delta_i = \Delta(\boldsymbol X_i)$, where $\Delta(\cdot)$ a function that counts the number of state transitions in $\boldsymbol X_i$.
+Then $\sigma_i = \delta_i/J_i \in [0, 1]$ is a score that measures the relative efficiency of sampling by comparing how how many transitions happened compared to the theoretical maximum. 
+
+Choice of which clades to track.
+
+\subsection{Multi-dimensional scaling}
+\label{sec:mds}
+
+Multi-dimensional scaling (MDS)~\citep{Hillis2005} 
+
+explain + cite relevant papers
+
+- Stress function
+- illustrative plot two panels (a) graph (b) MDS
+
+In other words, can we tell apart the MDS of two runs, one converged and one not converged (as assessed with other criteria)?
+
+\subsection{Graph (network) analysis of tree space}
+\label{sec:graph}
+Whidden \& Matsen
+How to fix the approach of~\cite{Whidden2015} ?
+
+\section{Accommodating time-calibrated phylogenies}
+\label{sec:accommodating}
+
+\section{Combining diagnostic measures}
+\label{sec:combining}
+
+\section{Final Remarks}
+\label{sec:remarks}
+
+
+% \bibliography{/home/max/Dropbox/PHD/THESIS/bibliography/lmcarvalho_PhD_Thesis}
