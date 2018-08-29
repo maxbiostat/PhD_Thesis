@@ -1,21 +1,25 @@
 \chapter{Investigation of the association between the GP82AV mutation in Ebola virus and fatality rates}
 \epigraph{The great tragedy of Science -- the slaying of a beautiful hypothesis by an ugly fact.}{Thomas Huxley (1825-1895) in \textit{Presidential Address at the British Association, Biogenesis and abiogenesis (1870)}.}
 
+
+In this chapter I lay out and expand on my contribution to~\cite{Diehl2016}.
+I scrutinise the association between being infected with a particular variant of the virus and the risk of dying, greatly extending the original analyses.
+
 \section{Introduction}
 
 One of the main scientific challenges emerging from the 2013-2016 Ebola virus disease (EVD) epidemic was understanding which factors contributed to such a large-scale epidemic.
-While many such factors are likely to have been of environmental and socio-economical nature~\citep{Dudas2017}, the role of biological adaptation remains unclear.
+While many such factors are likely to have been of environmental and socio-economical nature~\citep{Dudas2017}, the role of biological adaptation by the virus remains unclear.
 In particular, evolutionary questions pertaining to the adaptation of the virus to humans and/or accelerated evolution and their impact on the trajectory of the epidemic assumed a central -- and often contentious -- role in the scientific literature (see e.g.~\cite{Holmes2016} and Section 5 in~\cite{Bausch2017}).
 
+Ebola virus (EBOV) has a single-stranded negative-sense non-segmented RNA genome of around 18.9 Kb that encodes for at least 8 proteins (genes), amongst which the glycoprotein (GP), nucleoprotein (NP) and polymerase (L) are the most variable and useful for molecular epidemiology.
 The GP gene codes for the virus glycoprotein, which is expressed on the surface of the viral particle as a transmembrane receptor~\citep{Takada1997}.
 It is thought to be involved with  for receptor binding and membrane fusion and thus to be crucial for interaction with the host.
 This also means the GP gene is one of most studied genes in the Ebola virus (EBOV) genome~\citep{Li2016}.
 
-The present chapter concerns the study of the impact on EVD fatality of a particular non-synonymous C-to-T substitution at nucleotide $6,283$ mutation resulting in the wild-type alanine (A) being replaced by a valine (V) at the 82nd aminoacid position which interacts with the cell fusion receptor (NPC1).
+The present chapter concerns the study of the impact of a particular mutation on EVD fatality, namely a non-synonymous C-to-T substitution at nucleotide $6,283$ mutation resulting in the wild-type alanine (A) being replaced by a valine (V) at the 82nd aminoacid position which interacts with the cell fusion receptor (NPC1).
 This mutation, henceforth referred to as \verb|GP82AV| emerged early in the epidemic in Guinea (see Figure 1 in~\cite{Diehl2016}) and quickly spread through other countries and became dominant whereas the wild type (A) persisted in a few regions.
-In~\cite{Diehl2016}, we analysed some clinical data for which there was information on which GP82 genotype the virus isolated from a patient had and also the EVD outcome (died/survived).
-In that study, a positive association between  \verb|GP82AV| and higher risk of death (odds ratio: $2.09$, 95\% confidence interval [$0.94$, $4.64$]).
-
+In~\cite{Diehl2016}, we analysed a set of clinical data for which there was information on which GP82 genotype the virus isolated from a patient had and also the EVD outcome (died/survived).
+In that study, a positive association between  \verb|GP82AV| and risk of death (odds ratio: $2.09$, 95\% confidence interval [$0.94$, $4.64$]).
 
 \subsection{Adaptation to humans}
 
@@ -24,9 +28,9 @@ This naturally raised questions of whether the virus had adapted to humans and b
 As the authors themselves note, the evolutionary rate has little value in informing about the likelihood of adaptation to the host (discussed in detail in~\cite{Holmes2016}).
 The authors also estimate selection on the GP gene and find no difference between the West African sequences and samples previous epidemics.
 Their study did not however include any detailed experimental assessment of mutations in the GP gene and their impact on infectivity\footnote{In particular, the speculation that ``no non-synonymous substitutions occurred
-on the GP gene coding sequences of EBOV that were likely to affect protein structure or function in any way.'' (pg. 7) was later rebuked by~\cite{Urbanowicz2016} and~\cite{Diehl2016}.}.
+on the GP gene coding sequences of EBOV that were likely to affect protein structure or function in any way.'' (pg. 7) was later challenged by~\cite{Urbanowicz2016} and~\cite{Diehl2016}.}.
 
-\cite{Urbanowicz2016} and~\cite{Diehl2016} independently provide detailed experimental evidence on the impact of several point mutations in the GP gene on \textit{in vitro} infectivity in primate and human cells.
+\cite{Urbanowicz2016} and~\cite{Diehl2016} -- independently -- provide detailed experimental evidence on the impact of several point mutations in the GP gene on \textit{in vitro} infectivity in primate and human cells.
 Both studies employ pseudotyped HIV particles to study viral infectivity of mutants and wild type in several types of cells.
 These studies showed that viruses containing the \verb|GP82AV| mutation conferred increased human cell entry, and~\cite{Diehl2016} found a twofold increase in infectivity.
 \cite{Urbanowicz2016} also found decreased infectivity in bat cells, suggesting an evolutionary adaptive trade-off.
@@ -35,13 +39,13 @@ This is an important distinction, because it highlights the fact that even if \v
 
 \subsection{Considerations about effect size}
 
-While the studies by~\cite{Urbanowicz2016} and~\cite{Diehl2016} provide evidence that \verb|GP82AV| increases infectivity in human cells, the question of whether this increased infectivity could lead to more severe disease remains open.
+While the studies by~\cite{Urbanowicz2016} and~\cite{Diehl2016} provide evidence that \verb|GP82AV| increases infectivity in human cells, the question of whether the increased infectivity could lead to more severe disease remains open.
 It is entirely possible that the association between \verb|GP82AV| and fatality does not reflect any underlying causation.
 I expect the outcome, i.e., whether an individual dies of EVD, to be dependent on a swathe of host- and population-specific factors.
 An individual's age, sex, immune and nutritional status are expected to have a large contribution to risk of death\footnote{Importantly, this information is unfortunately not available for the data analysed in this chapter.}.
 In addition, whether an individual can get access to medical attention depends on the availability of health care facilities in the region.
 
-It is therefore important to scrutinise these estimates in order to assess their robustness to noise and confounding.
+It is therefore important to scrutinise these estimates in order to assess their robustness to noise and confounding factors.
 In other words, the main purpose of this chapter is to present a comprehensive analysis of the data in~\cite{Diehl2016} along with an in-depth discussion of the effect size of  the \verb|GP82AV| mutation in increasing fatality.
 The analyses presented in that study are expanded in several ways: (i) I include more covariates in a more sophisticated model; (ii) I assess the robustness of the effect size estimates for \verb|GP82AV| by exploring (a) different model formulations and (b) several prior distributions for the effect size.
 
@@ -50,15 +54,19 @@ Finally, I employ comparative method techniques to estimate heritability of vira
 
 \section{Methods}
 
+In this chapter I shall make use of both orthodox (frequentist) and Bayesian methods, which might cause some confusion.
+While I compute both confidence and credibility (or credible) intervals for various quantities, it is important to note that these are fundamentally different objects, in both construction and goal.
+While confidence intervals are built with frequency guarantees in mind (e.g. a properly constructed 95\% confidence interval will contain the true parameter in 95\% of replicate experiments), credibility intervals are constructed to give a 95\% probability that the true parameter is contained in the interval, without reference to replicated experiments/data sets.
+
 \subsection{Data}
 
 From the 1610 full EBOV genomes available, $316$ had information on cycle threshold (\ct) values and $299$ sequences had information on patient outcome (died/survived)\footnote{Please note there are small differences between the data described here and that analysed by~\cite{Diehl2016}.}.
-There were $233$ sequences with complete information on \ct~and outcome, of which $221$ also had information about location.
-When focusing solely on sequences from Guinea, we are left with $202$ sequences.
-
+The cycle threshold is a measure of how many polymerase chain reaction (PCR) cycles are necessary to obtain amplification of a given target sequence, and thus is directly related to the relative abundance of said sequence in the sample and can be used as a proxy for viral load, or the amount of virus DNA in a sample.
 Since the cycle threshold (\ct) is inversely and non-linearly related to the amount of virus DNA in the sample, which in turn is thought to be correlated with viral load, I propose to transform \ct~in order to get the viral load $\text{VL} = -\log \text{C}t$.
 While this transform ensures the sign of the coefficient in a regression setting is easier to interpret, magnitude is an entirely separate problem.
 Since the main goal in this chapter is to study the effect of \verb|GP82AV| I will not pursue this issue any further.
+There were $233$ sequences with complete information on \ct~and outcome, of which $221$ also had information about location.
+When focusing solely on sequences from Guinea, we are left with $202$ sequences.
 
 In order to aid modelling location-specific heterogeneity in case fatality rates, I collected a number of location-level predictors.
 Specifically, I collected data on how many health centres, clinics and pharmacies there were in each prefecture (level 2 administrative unit).
@@ -83,7 +91,7 @@ The most common choice by far is the logistic link, mainly because it is easy to
 The \textbf{odds ratio} $\text{OR}_i = \exp(\hat{\beta_i})$ gives a direct estimate of risk associated with the $i-$th predictor that is of great value in many scientific fields, particularly Epidemiology~\citep{Schmidt2008}.
 
 The basic model in~(\ref{eq:binglm}) can be extended in several ways, including particular structures for the errors $\boldsymbol\epsilon$. 
-In the following sections I detail multilevel\footnote{Also called ``random effects'' models. I prefer the term ``multilevel'' because it captures the true power of the framework: modelling data at several stages/level and pooling information in a principled way. See sections 1.1 and 11.4 in~\cite{Hill2007} for a discussion on nomenclature.} extensions that are useful to the modelling task at hand.
+In the following sections I detail multilevel\footnote{Also called ``random effects'' models. I prefer the term ``multilevel'' because it captures the true power of the framework: modelling data at several stages/level and pooling information across strata in a principled way. See sections 1.1 and 11.4 in~\cite{Hill2007} for a discussion on nomenclature.} extensions that are useful to the modelling task at hand.
 
 \subsubsection{Multi-level models}
 \label{sec:multilevel}
@@ -103,13 +111,13 @@ For the purposes of this chapter, I will consider location-varying intercepts mo
   \delta_j &= \boldsymbol Z_j^\intercal \boldsymbol\gamma.
 \end{align}
 where $\theta$ is an overall intercept, $\boldsymbol Z$ are group (location) level predictors, $\boldsymbol\gamma$ are the corresponding coefficients and the errors $\boldsymbol\epsilon$ are modelled as before (Eq.~\ref{eq:binglm}).
-While this model is said to do \textit{partial pooling}, an alternative model where $\alpha_j\sim f()$ assumes locations are i.i.d. and therefore does no pooling of information across locations.
+While this model is said to do \textit{partial pooling}, an alternative model where $\alpha_j\sim f(\cdot)$ assumes locations are i.i.d. and therefore does no pooling of information across locations.
 A model where $\gamma_j = 0 \: \forall j$ (and therefore $\delta_j = 0 \: \forall j$) is said to be a \textit{complete pooling} model.
 
 \textbf{Computational details}
 
-I fit all generalised multilevel models using the probabilistic programming language Stan~\citep{Carpenter2017}, which allows the use  of Hamiltonian Monte Carlo (HMC,~\cite{Neal2011}) to approximate posterior distributions (see Chapters 1 and 4 for more details on Bayesian inference and prediction).
-I run 4 independent chains of 5000 iterations with 2500 iterations discarded as burn-in (also called warm-up).
+I fit all generalised multilevel models using the probabilistic programming language Stan~\citep{Carpenter2017}, which allows the use  of Hamiltonian Monte Carlo (HMC,~\cite{Neal2011}) to approximate posterior distributions.
+I run 4 independent chains of 5000 iterations with 2500 iterations discarded as warm-up.
 I assessed convergence by visually inspecting parameter traces, checking that effective sample sizes were above $200$ and the $\hat{R}$ statistic~\citep{Brooks1998} was close to $1.0$.
 
 \subsubsection{Prior modelling and effect size}
@@ -170,7 +178,7 @@ I also consider the so-called g-prior~\citep{Zellner1986}, which scales the cova
 Here I explore a g-prior with $g = N$ and a g-prior with an inverse-Gamma hyperprior on $g$ as discussed in~\cite{Liang2008}\footnote{It should be noted that the impact of the g-prior is minimised in our setting due to the scaling of the predictors. It is included here mostly for completeness.}.
 
 A small caveat of eliciting the priors based on three quantities (mean, lower and upper 95\% quantiles) is that matching all three is sometimes not attainable.
-Whenever this happened I chose prioritise the mean and upper quantile for the neutral prior while focusing on the mean and lower quantile for the optimistic prior.
+Whenever this happened I chose to prioritise the mean and upper quantile for the neutral prior while focusing on the mean and lower quantile for the optimistic prior.
 Elicitation  of the conservative prior encountered no such problems, mostly due to the small variances involved.
 
 \textbf{Priors for the multi-level model parameters}
@@ -198,6 +206,7 @@ Additionally, I employ the Bayesian approach to Pagel's $\lambda$~\citep{Pagel19
 For the purposes of this chapter it is convenient to recall the interpretability of the phylogenetic correlation coefficient $\lambda_B$\footnote{The subscript denotes the fact that these estimates are Bayesian estimates derived from the posterior distribution of trees and hence accounting for phylogenetic uncertainty.}: if $\lambda_B = 0$ there is no correlation between phylogeny and the trait under analysis.
 Conversely, $\lambda_B = 1$ corresponds to a setting where trait evolution reproduces a Brownian motion process along the phylogeny exactly.
 Intermediate values represent the lack of adherence of the observed data to a BM.
+These analyses used the same phylogenetic model described above, along with a boundary-avoiding Beta prior with parameters $\alpha = \beta = 2$ on $\lambda_B$.
 
 \subsubsection{Phylogenetic regression}
 \label{sec:phyloreg}
@@ -218,7 +227,7 @@ where $\boldsymbol 1$ is a $1 \times N$ unit vector, $\boldsymbol A$ is a diagon
 I use the \verb|phyloglm()| function in the~\textbf{phylolm} R package~\citep{Lam2014} to fit this model to the data using the phylogeny estimated as described above.
 Confidence intervals were obtained with $500$ parametric bootstrap replicates.
  
-\subsubsection{Type M and S errors}
+\subsection{Type M and S errors}
 \label{sec:MSerror}
 
 In the framework of orthodox\footnote{Also called frequentist.} statistical inference and hypothesis testing, statements regarding reality are framed in terms of contrasts to a hypothesis.
@@ -466,12 +475,12 @@ Figure~\ref{fig:CTAtree} shows clear structure in viral load values across linea
 Taken together with the results from this section, this provides a possible explanation for the observed results: since viral load is moderately inheritable and the V mutation in GP emerged quite early -- in a deep branch --, the apparent association between \verb|GP82AV| and fatality might just be a result of latent dependence on the tree.
 These findings reinforce the claim by~\cite{Russell2017} that the study and management of infectious diseases must be evolutionary, that is take into account evolutionary factors, the main of which is shared ancestry.
 
-\subsection{Does GP82AV increase the risk of death?}
+\subsection{Does GP82AV increase the risk of death from EVD?}
 
 The short answer is: probably not.
 
 The first issue to consider is that of \textbf{uncertainty}. 
-In order to make claims about the effect of the \verb|GP82AV| mutation one needs first to quantity the uncertainty about the effect size.
+In order to make claims about the effect of the \verb|GP82AV| mutation one needs first to quantify the uncertainty about the effect size.
 As the analyses in Section~\ref{sec:MSerror} show, for a low true effect size (risk ratios $<1.10$, the standard error estimated with the current design/data could lead to gross overestimation of the effect. 
 It must also be said that these analyses suggest that a sign error, that is an error that would lead to inferring \verb|GP82AV| to be a protective factor, is very unlikely.
 If the mutation has any bearing on the outcome of EVD at all, it most likely increases the risk of dying.
@@ -509,21 +518,26 @@ Vertical dotted line indicates the average viral load (recall the predictor is s
 \end{figure}
 
 The third point I propose considering is~\textbf{dependence}.
+For instance, the methods in Section~\ref{sec:priors} rely heavily on the translation of risk ratios into odds ratios in order to elicit the prior distributions.
+But as~\cite{Morozova2018} argue, risk ratios need careful interpretation when the outcome is contagious because transmissibility induces dependence between individuals.
+The prior elicitation conducted here ignores this problem, although this could be relaxed in future research.
 While exploring different sources of error, prior formulations and accounting for heterogeneity are all important, accommodating dependence between observations addresses a key assumption of my previous analyses.
 Having access to complete genomes instead of, say, just genotyping information, allows us to estimate a phylogeny for the data points in study and hence obtain a proxy for the underlying dependence structure of the data.
 The results from Section~\ref{sec:results-phylo} show that, after controlling for shared ancestry, the (bootstrap) confidence intervals for the effect of \verb|GP82AV| include the null hypothesis of no effect.
 
-While I could combine all previous approaches into one single complicated model to further enquiry, it is my opinion that what we really need is more data and/or a better design.
+
+While I could combine all previous approaches into one single complicated model for further inquiry, it is my opinion that what we really need is more data and/or a better design.
 Two final points worth considering are the roles of host heterogeneity and study design.
 The data I analyse in this chapter unfortunately do not include important host (patient) information such as age, sex, pre-existing health conditions, etc.
 It is entirely conceivable that heterogeneity in immune responses could be driving most of the variation in fatality rates.
 Future efforts in matching patient data and available sequences may alleviate this problem by providing the missing information.
 
 Even if more detailed patient information were available, however, the sample analysed here is one of convenience, collected as the epidemic progressed and patients were treated and tested at health care facilities, without a careful experimental design in mind.
-This introduces bias that are hard to correct for (see for example the results in Section~\ref{sec:results-multilevel}).
+This introduces biases that are hard to correct for (see for example the results in Section~\ref{sec:results-multilevel}).
 A key insight is that if a mutation appears early on during an epidemic and then becomes fixed, it is difficult to disentangle its effects from other confounding factors at various levels, (exposure, geography, control measures, etc, see discussion in~\cite{Diehl2016}).
 Conversely, if a mutation occurs repeatedly during an epidemic, we have much more scientific power to study its association with outcomes of interest such as fatality.
 In other words, whether \verb|GP82AV| does indeed increase the chance of dying of EVD may not be answerable insofar as it may require direct experimentation in human subjects, which would be ethically unacceptable.
+A recent study detailing experimentation in non-human subjects (mice and rhesus macaques) failed to show increased pathogenicity of \verb|GP82AV|~\citep{Marzi2018}.
 
 \section{Conclusions}
 \label{sec:conclusions}
@@ -534,3 +548,5 @@ When many sources of uncertainty about the effect of the \verb|GP82AV| mutation 
 I also show that accounting for dependence between observations through the phylogeny leads to a substantial increase in uncertainty about the effect.
 Phylogenetic methods proved crucial to account for the dependence in the data and provide correct answers.
 The main lesson here is that all scientific statements, in order to be valid and useful, must be coupled with a proper account of the associated uncertainty and model assumptions.
+
+% \bibliography{/home/max/Dropbox/PHD/THESIS/bibliography/lmcarvalho_PhD_Thesis}
