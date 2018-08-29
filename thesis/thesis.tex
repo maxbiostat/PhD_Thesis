@@ -15,7 +15,11 @@
 \chapter{Abstract}
 \markboth{\MakeUppercase{Abstract}}{\MakeUppercase{Abstract}}
 \input{\dir/abstract.tex}
+\chapter{Lay Summary}
+\markboth{\MakeUppercase{Abstract}}{\MakeUppercase{Lay Summary}}
+\input{\dir/lay_summary.tex}
 \input{\dir/acknowledgements.tex}
+\input{\dir/dedication.tex}
 
 {\setlength{\parskip}{0ex plus 0.5ex minus 0.2ex}
 
@@ -55,15 +59,22 @@
 \input{\dir/chapter2.tex}
 \renewcommand{\dir}{../chapter3/chapter/}
 \input{\dir/chapter3.tex}
-
+\renewcommand{\dir}{../chapter4/chapter/}
+\input{\dir/chapter4.tex}
+\renewcommand{\dir}{../chapter5/chapter/}
+\input{\dir/chapter5.tex}
+\renewcommand{\dir}{../chapter6/chapter/}
+\input{\dir/chapter6.tex}
 %========================= Appendix ========================= 
-\renewcommand{\chaptermark}[1]{%
- \markboth{\MakeUppercase{%
- \appendixname} \ \thechapter.%
- \ #1}{}}
-%\renewcommand{\dir}{../appendix/appendix}
-%\input{\dir/appendix.tex}
-
+% \renewcommand{\chaptermark}[1]{%
+%  \markboth{\MakeUppercase{%
+%  \appendixname} \ \thechapter.%
+%  \ #1}{}}
+\begin{appendices}
+\renewcommand{\dir}{../appendix/appendix}
+\input{\dir/pipeline.tex}
+\input{\dir/supplementary_results.tex}
+\end{appendices}
 %========================= BIBLIOGRAPHY ========================= 
 \ifthenelse{\boolean{edthesis}}
  {
