@@ -1,0 +1,168 @@
+\chapter{Discussion}
+\epigraph{ 
+Nobody exists on purpose, \\
+nobody belongs anywhere, \\
+everybody is  going to die.\\
+Come watch TV.
+}{Morty Smith (Dimension C-137) to his sister Summer, in episode ``Rixty Minutes'' of \textit{Ricky and Morty} (2014).}
+
+In this final chapter I offer critical appraisal of the work I presented in this thesis and discuss how my findings fit into the general picture.
+
+\section{Improving the methodological apparatus}
+
+\textbf{A framework for the development and testing of proposal mechanisms}
+
+The fist goal of this work was to expand the set of tools available to the practitioner when running MCMC in phylogenetic space in order to reconstruct phylogenies.
+When employing complex phylodynamic models to extract useful information from genomic data, phylogenies are frequently a \textit{nuisance parameter}, that is a parameter that needs to be estimated but is not of direct (scientific) interest.
+Therefore when performing posterior simulation through MCMC, special focus is given to diagnosing convergence with respect to continuous parameters  such as the evolutionary rate, growth rates and the basic reproductive number, $R_0$.
+This is a crucial insight, only partially explored in this thesis: while we would like to obtain the most accurate representation of the posterior distribution of trees, ultimately we are concerned with designing algorithms that can efficiently traverse phylogenetic space so that we can integrate over plausible phylogenies and hence obtain estimates that accommodate phylogenetic uncertainty. 
+In other words, since we are interested in, say, the evolutionary rate, how much (computational) effort is necessary to obtain marginal distributions for this parameter that properly accommodate phylogenetic uncertainty?
+This is mainly achieved through the design of efficient transition kernels that lead to rapidly mixing Markov chains.
+
+As argued in Chapter 2, simple, unguided random proposal mechanisms for phylogenies usually have low acceptance probabilities and show poor performance.
+On the other hand, any ``guided'' candidate-generating mechanism (operator) needs to be cheap enough to compute so as to enable fitting models in reasonable time, a task made even more pressing in an era when researchers are moving toward real-time analysis of phylodynamic data.
+Our solution entails an adaptive operator, SubTreeLeap (\verb|STL|) that simultaneously updates branch lengths and tree topology while exploiting a natural metric in phylogenetic space, patristic distance.
+I show that this operator leads to better mixing not only in phylogenetic space but also for continuous parameters that depend on the phylogeny.
+Results were particularly encouraging for a very challenging data set of 1610 complete EBOV genomes.
+I also found, however, that \verb|STL| can suffer with premature adaptation, leading to the chain being stuck at a mode and hence poor sampling of the target.
+This issue is mostly ameliorated by combining \verb|STL| with \verb|STJ|, another operator developed in this thesis and that can help the chain jump between modes.
+
+Chapter 2 also details some new tools I developed in order to better evaluate MCMC performance for phylogenies.
+For example, I expand on the the idea put forth by~\cite{Lanfear2016} and propose obtaining a golden tree from independent, long golden runs~\citep{Hoehna2008,Lakner2008} and then computing the distribution of the distance to this golden tree under several metrics and then using these distributions as a (univariate) representation of the desired target.
+This allows the analysis of warm-up (burn-in) times and also mixing performance.
+Being inherently  based a global metric, however, assessing convergence based on the distance to true tree is likely to be stringent, similar to comparing global convergence in terms of overall clade frequencies.
+Whilst previous studies (e.g.~\cite{Lakner2008} and~\cite{Hoehna2008}) proposed looking solely at clade frequencies, I propose to augment the analysis of clade space by considering the rate at which clade indicators flip in the chain.
+While not without its technical difficulties -- for instance it depends on knowing the true clade frequencies, which is frequently infeasible in practice -- this quantity offers yet another tool in the analyst's toolbox for determining whether the MCMC is reliable.
+Section~\ref{sec:correctness} in Chapter 2 offers some tests and checks one can implement to verify the correctness of a phylogenetic sampler in the absence of an independent implementation of the sampler in question but when a golden standard implementation is available.
+These tools are important because phylogenetic space is a non-standard parameter space, which renders most common tools for assessing convergence and correctness partially or completely inappropriate.
+I hope these tools can be combined with the existing tool set and used in future Bayesian phylogenetics studies.
+
+While the improved performance shown by \verb|STX| (\verb|STJ| + \verb|STL|) is encouraging, specially considering the results for the EBOV data set, I see the efforts in Chapter 2 as a starting point rather than a complete solution.
+There are further performance gains to be accrued by more carefully considering which aspects of the structure of the target distribution we can exploit (see below and discussion in Chapter 2 for more).
+For instance, \verb|STL| finds destinations a certain distance $\delta$ away from the current node but then picks amongst them uniformly. 
+Would picking locations proportional to their distance lead to better performance? Or would it exacerbate the premature adaptation problems already observed?
+While theoretical investigation is certainly a possibility to be explored in the future, these questions ultimately need to be settled by (computational) experiment.
+
+
+\textbf{We need a better mathematical understanding of phylogenetic space} 
+
+As I have shown in Chapters 2 and 3, representing phylogenetic space through multi-dimensional scaling can lead to inconsistent results.
+For instance, MDS under the Steel-Penny metric~\citep{Steel1993} failed to show serious problems with the EBOV 1610 runs using only \verb|STL| (Chapter 3, Figure~\ref{fig:mds_ebov_SP}).
+In addition, while MDS analyses routinely show only the first two components of the projection (presumably for ease of interpretation/visualisation) for some of the data sets I analysed in Chapter 3 -- and some metrics -- it is clear that one needs more than two components to fully capture a substantial amount of the variation in the data.
+While MDS remains a useful tool for studying exploration of phylogenetic space, these results should heed a warning to practitioners that (i) multiple metrics should be explored and (ii) bi-dimensional representations might not be sufficient to  adequately represent the space under study.
+
+On the theoretical front, compared to what is known for high dimensional smooth parameter spaces, mainly manifolds, we know very little about the geometry and properties of phylogenetic space.
+The efforts by~\cite{Billera2001},~\cite{Gavryushkin2016} and~\cite{Whidden2017} at characterising the space of phylogenies, while extremely valuable, only scratch the surface.
+Phylogenetic space admits both discrete (``discrete tree space in~\cite{StJohn2017}) and continuous (``continuous tree space) representations, none of them canonical.
+While these capture distinct features the inter-dependence between topology and branch lengths means that any geometrical understanding of phylogenetic space needs to come accompanied by some natural traversing metric.
+The Billera-Vogtmann-Holmes (BHV)~\citep{Billera2001} space admits unique geodesics and allows for the definition of quantities such as expectations and variances, and appears as a strong candidate for a canonical representation of phylogenetic space.
+The ``stickiness  of the mean -- that is perturbing a sample of trees may very well not change their mean tree -- and the sharpness (lack of differentiability) at the boundaries are important shortcomings, however. 
+
+Very recent developments have brought the promise of a more a natural representation of phylogenetic space in $\mathbb{R}^d$ in the form of the log map of~\cite{Barden2018}.
+The log map allows for a representation of the BHV space that not only allows for expectations and variances but also admits rotations\footnote{And preserves directionality.} and thus opens up the possibility for computing (defining) covariances and hence prove central limit theorems in this space.
+This new representation has already been used successfully to quantity uncertainty in phylogenetic estimates in a paper by~\cite{Willis2017}.
+It is possible that these new results could be combined with the work of~\cite{Nye2015} on Brownian motion in phylogenetic space to design more efficient sampling methods.
+The crucial insight is that, as argued by~\cite{StJohn2017}, a better understanding of the structure of phylogenetic space can not only improve search  algorithms -- be them for optimisation or sampling -- but also the analysis of MCMC output.
+The core idea here is that we need better~\textbf{statistical} representations (see~\cite{Holland2013}) of phylogenetic space so we can leverage tools from data analysis and visualisation to study phylogenies.
+
+\section{Data integration in phylodynamics}
+
+Phylodynamics is ultimately concerned with using genomic information to answer epidemiological and evolutionary questions.
+This means that it is equally as important or more to develop ways of integrating data from several sources in order to draw inference about the processes driving pathogen evolution and spread.
+As the quantity and quality of data grow, so too must our statistical and mathematical models, if we are to have any hope to capture nature's intricacies in any useful way.
+I argue that data integration can happen in mainly two forms: (a) via the construction of~\textbf{joint models} that explicitly incorporate the relationship between phylogeny and other model parameters and (b) via the analysis and modelling of the~\textbf{output of phylodynamic analyses}.
+Both applications in this thesis are of the latter type.
+
+In Chapter 4 I explored a fairly standard generalised linear model coupled with Bayesian stochastic variable selection (BSSVS) to investigate factors associated with the proliferation (number of cases) and persistence of EBOV in West Africa.
+There are two points at which the output of a phylodynamic analysis enters this model, first in the form of phylogenetic covariates such as the number of viral introductions and distances between introductions which were extracted from a phylogeographic model fitted to the EBOV data~\citep{Dudas2017}.
+The second way phylodynamic data is combined with other environmental and socio-economic data in Chapter 4 is by using persistence times (again extracted from the data of~\cite{Dudas2017}) as a response variable.
+Using this information allowed me to discover that the factors associated with persistence are different than those associated with the number of cases, which is valuable epidemiological inference that could be used by public health authorities.
+It should be noted that the application of the BSSVS framework bears many similarities with the model employed to investigate which factors contributed to the~\textit{spread} of EBOV which is a joint model in the form (a) above.
+In this particular application while it would have been quite difficult to construct a full joint model in BEAST, accommodating phylogenetic uncertainty is straightforward and entails running the model for samples extracted from each iteration of BEAST run.
+This constitutes a possibility for future research.
+
+The main concern in Chapter 5 was to properly accommodate uncertainty -- not just phylogenetic -- in order to evaluate the association between a particular mutation on the virus and the outcome of EVD~\citep{Diehl2016}.
+This was accomplished by tackling the same question from several angles, employing different statistical models.
+I used a  phylogenetic Brownian motion model to study the relationship between viral load and phylogeny, as way of gaining insight into how this covariate -- which is strongly associated with the outcome -- varies along the underlying phylogeny.
+In addition, I fit phylogenetic regression models that account for shared ancestry between observations and therefore are conceptually superior to i.i.d models.
+In this instance, I could have built a full joint model in a manner similar to the approach of~\cite{Cybis2015}, who build a latent liability model that models a latent variable through Brownian motion and apply the appropriate transformation in order to be able to condition on the data at the tips\footnote{In this case any of the link functions commonly associated with binary regression would be suitable.}.
+
+As stated in Chapter 1, proper appreciation of phylogenetic uncertainty, more specifically propagating phylogenetic uncertainty to parameter estimates, is at the heart of Bayesian phylodynamic inference.
+On the other hand, joint modelling of phylogeny and the process of interest (transmission, growth, virulence, adaptation, etc) is sometimes hard to implement.
+This suggests that, while not ideal, separate statistical treatment of phylodynamic output as exemplified in Chapters 4 and 5 may offer a helpful compromise between full joint modelling and not acknowledging phylogeny altogether.
+As discussed by~\cite{Baele2016}, even when we know for a fact that there is shared ancestry between observations, the researcher should ask herself whether the variables under study are correlated with phylogeny\footnote{Recall that it is entirely possible to have non-independent but uncorrelated random variables.}, what can be partially -- if sub-optimally -- addressed by estimating phylogenetic signal~\citep{Vrancken2015} and quantify the correlation between covariates and phylogeny.
+This questions is -- perhaps unsurprisingly -- connected to the question posed above about the strength of dependence of certain parameters of interest $\boldsymbol\theta$ on the underlying phylogeny: if the joint model results in virtually independent components between phylogenies and $\boldsymbol\theta$, then there is very little to gain by constructing a joint model, and the technical overhead is not negligible.
+
+I should stress however that, in principle, a full joint model is always preferable.
+\cite{Baele2016} not only offer an excellent review of the state of the art in phylodynamics data integration but also show a plethora of examples for which the technical machinery is already in place.
+These range from compartmental epidemiological models~\citep{Rasmussen2011} to transmission trees~\citep{Hall2015} to antigenic evolution~\citep{Bedford2015}.
+Their review touches on many points not covered in this section.
+
+\section{Where are we headed?}
+
+I conclude this chapter with a few predictions on where phylodynamics might go in the coming years, focusing mainly on questions related to those tackled in this thesis.
+% I shall use some of the challenges laid out by~\cite{Frost2015} as a guide.
+
+\textbf{Metropolis-Hastings is not the ultimate tool}
+% Challenge 8 in~\cite{Frost2015} states ``How can analytical approaches keep up with advances in sequencing?''.
+
+Developed in the 1950s and popularised in Statistics after the 1970s, the Metropolis-Hastings (MH) algorithm has been a work horse of computational statistics ever since, much due to its simplicity and ease of implementation.
+Phylogenetic space presents a challenge to traditional MCMC because of its mixed geometry, including discrete and continuous components that interact in non-trivial ways rendering most of the available theoretical results inadequate.
+Perhaps of because of this non-standard nature of the parameter space, MCMC for phylogenetics has been mainly restricted to Metropolis-Hastings schemes.
+BEAST~\citep{Drummond2012}, BEAST2~\citep{Bouckaert2014}, Mr Bayes~\citep{Huelsenbeck2001a} and RevBayes~\citep{Hoehna2016} all rely heavily on MH-type updates to sample from the posterior.
+
+While MH allows sampling from complex distributions with relative little implementation overhead, it has become clear over the years that it is also prone to random walk behaviour, specially in high-dimensions.
+This is because of a phenomenon known as~\textit{concentration of measure}, which loosely means that as the dimension grows, less and less mass is concentrated around the mode(s).
+Therefore, any transition kernel (proposal mechanism) that does not exploit the structure of the target but instead naively proposes points in the high-dimensional space based on perturbations of the current state is going to mix poorly.
+Since most update schemes implemented in the above-mentioned packages are based on random perturbations of the current phylogeny, I argue that there is much room for improvement within the MH framework.
+As discussed more thoroughly in the discussion section of chapter 2, while our proposed kernels, \verb|SubTreeJump| and \verb|SubTreeLeap|, enjoy many convenient theoretical and empirical properties, they ultimately fail to exploit posterior structure to its fullest.
+Since phylogenetic space is inherently multi-modal, the development of mode-jumping~\citep{Tjelmeland2001} and locally-balanced~\citep{Zanella2017} transition kernels is bound to lead to substantial gains.
+
+However, whilst new transition kernels for MH are likely to continue yielding substantial performance gains, the algorithm itself can only go so far.
+I therefore argue that in parallel to the development and testing of new MH-based MCMC schemes, we should also considering alternative sampling algorithms, such as Hamiltonian Monte Carlo (HMC).
+HMC has become a very popular MCMC algorithm as of late, mainly due to its superior performance for complex models (multi-level, Gaussian processes, etc) that were previously hard to fit via Gibbs samplers and MH.
+The chief limitation of HMC for sampling phylogenetic posteriors is that it relies on constructing a Hamiltonian for which derivatives w.r.t. the parameters exist and are continuous.
+A recent paper by~\cite{Dinh2017} gets around this limitation by constructing a so-called ``Probabilistic Path Hamiltonian Monte Carlo'' (PPHMC) algorithm that exploits the continuous nature of orthants in BHV space and carefully constructs transitions when traversing the boundaries of the space, which correspond to different topologies.
+While their results are still preliminary and a substantial amount of computational work would be necessary to approximate the types of posteriors that BEAST can sample, their work does bring the promise of leveraging several recent theoretical developments made for HMC to sample phylogenies.
+
+The main insight missing at the moment is what constitutes a good transition in phylogenetic space.
+Without this understanding, researchers often resort to uninformed random perturbations of the current phylogeny, as is the case for boundary (topological) moves in the PPHMC of~\cite{Dinh2017}.
+We need more empirical study of real posteriors coupled with theoretical investigations in order to design transition kernels that are effective.
+
+\textbf{Towards a robust Bayesian phylogenetic workflow}
+
+From a statistical point of view, it is desirable that any inference procedure and its associated computational machinery have checks for self-consistency that allow the user/practitioner to detect when results are valid.
+Ideally, when a researcher inputs her data into a program such as BEAST with the goal of performing a phylodynamic analysis, she should be able to detect problems with her model and/or data while running the program instead of receiving seemingly valid answers that are ultimately wrong.
+A good example is model selection via marginal likelihood  estimation: if a user attempts to estimate marginal likelihoods using improper priors, the program should at the very least throw a warning, since there is no guarantee the posterior will be proper and hence that the results will be valid.
+As the field moves forward and more researchers adopt the Bayesian framework, I envisage the development of a robust Bayesian phylogenetics workflow as a crucial tool to ensure valid scientific inference.
+
+Running multiple chains starting from overdispersed states is a powerful tool to detect glaring problems, but to the best of my knowledge, this is not common practice amongst biologists using BEAST.
+In contrast, Mr Bayes runs multiple chains by default and computes the average standard deviation in clade (split) frequencies (ASDSF) between chains.
+Ideally, any Bayesian phylogenetics workflow would not only include multiple runs, but also employ more diagnostic metrics beyond ASDSF.
+Computing the potential scale reduction factor for phylogenies (under different metrics) and continuous parameters is straightforward and should be included by default in programs such as Tracer (\url{http://tree.bio.ed.ac.uk/software/tracer/}) for the latter.
+
+MCMC might present subtle biases that are hard to diagnose (see Chapter 3).
+These bias might stem from multi-modality and extreme (posterior) correlations that make it hard for the MCMC to explore parameter space efficiently, but not always lead to detectable problems such as low ESS.
+I therefore argue that more theoretical statistical work needs to be done in order to understand phylogenetic posteriors, specially regarding prior modelling.
+The work by~\cite{Yang2005} and~\cite{Wang2014} has called attention to the construction of priors in phylogenetics, where it is not uncommon for researchers to assign uniform, seemingly ``uninformative'' priors that lead to very strong constraints on the posterior and have unintended consequences~\citep{Seaman2012}.
+The coalescent has theoretical justifications that make it an attractive prior on phylogenies, but as I show in Chapter 2 (Section~\ref{sec:prior_maths}), the prior is flat in (potentially large) portions of the space of ranked phylogenies\footnote{I stress however I do not claim originality about this observation.}, which means it places no constraints on the potential multimodality induced by the likelihood.
+Moreover,~\cite{Boskova2018} have very recently shown that phylodynamic analyses of early epidemics can be quite sensitive to tree priors.
+It is clear, therefore, that the development of better priors, that incorporate more structure and are less susceptible to biases, is an important avenue of future research (see~\cite{Moller2018} for a step in this direction). 
+
+\textbf{Real-time phylodynamics}
+
+On the applied front, recent advances in sequencing technology allowed researchers to obtain genomic sequences with minimal delay~\citep{Quick2016}.
+Coupled with successes in the analyses of large collections of serially-sampled viral genomes~\citep{Dudas2017}, this has opened the possibility of real-time analysis of pathogen genomic data as the epidemic progresses.
+
+Initiatives such as \verb|nextstrain| (\url{http://nextstrain.org/}, \cite{Hadfield2017}) have shown that it is possible to not only curate existing information publicly available on GenBank (\url{https://www.ncbi.nlm.nih.gov/genbank/}) but also provide powerful visualisation capabilities that combine the output of complex phylogenetic/phylodynamic models running under the hood with maps and colours to display information in usable form.
+Recently, the \verb|ARTIC| network (\url{http://artic.network/}) has been formed to develop, in their own words, ``an end-to-end system for processing samples from viral outbreaks to generate real-time epidemiological information that is interpretable and actionable by public health bodies.'' 
+
+Apart from further development in the logistics of deploying the sequencing apparatus in the field -- the ``lab in a suitcase'' -- the success of this initiative will hinge on having the computational capabilities for processing the data (bioinformatics), drawing inference (statistics) and conveying information in a useful way (visualisation).
+On the statistical side, sequential Monte Carlo (SMC) methods are at the forefront of Bayesian on-line phylogenetic inference~\citep{Dinh2016,Fourment2017,Everitt2018}.
+Much conceptual work is needed in order to ensure that phylogenies built when one (or a few) taxa are added at a time are accurate and I see the development of heuristics for taxa placement as a promising way of shortening convergence times in sequential analyses.
+
+These new avenues of research are related to challenge 8 in~\cite{Frost2015} (``How can analytical approaches keep up with advances in sequencing?'').
+While presenting a plethora of technical hurdles to be overcome, real-time/on-line analysis seems to be the way to deal with the ever growing mass of available data and, more importantly, provide public health authorities with useful information that can be used in mitigation strategies.
+The call of~\cite{Pybus2013} is now perhaps truer than ever; we must -- hastily -- prepare for an era of genomic plenty.
+
+% \bibliography{/home/max/Dropbox/PHD/THESIS/bibliography/lmcarvalho_PhD_Thesis}
