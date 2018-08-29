@@ -1,1 +1,14 @@
-The abstract...
+The recent years have witnessed a rapid increase in the quantity and quality of genomic data collected from human and animal pathogens, viruses in particular.
+When coupled with mathematical and statistical models, these data allow us to combine evolutionary theory and epidemiology to understand pathogen dynamics.
+While these developments led to important epidemiological questions being tackled, it also exposed the need for improved analytical methods.
+In this thesis I employ modern statistical techniques to address two pressing issues in phylodynamics: (i) computational tools for Bayesian phylogenetics and (ii) data integration.
+I detail the development and testing of new transition kernels for Markov Chain Monte Carlo (MCMC) for time-calibrated phylogenetics in Chapter 2 and show that an adaptive kernel leads to improved MCMC performance in terms of mixing for a range of data sets, in particular for a challenging Ebola virus phylogeny with 1610 taxa/sequences.
+As a trade-off, I also found that the new adaptive kernels have longer warm up times in general, suggesting room for improvement.
+Chapter 3 shows how to apply state-of-the-art techniques to visualise and analyse phylogenetic space and MCMC for time-calibrated phylogenies, which are crucial to the viral phylodynamics analysis pipeline.
+I describe a pipeline for a typical phylodynamic analysis which includes convergence diagnostics for continuous parameters and in phylogenetic space, extending existing methods to deal with large time-calibrated phylogenies.
+In addition I investigate different representations of phylogenetic space through multi-dimensional scaling (MDS) or univariate distributions of distances to a focal tree and show that even for the simplest toy examples phylogenetic space remains complex and in particular not all metrics lead to desirable or useful representations.
+On the data integration front, Chapters 4 and 5 detail the use data from the 2013-2016 Ebola virus disease (EVD) epidemic in West Africa to show how one can combine phylogenetic and epidemiological data to tackle epidemiological questions.
+I explore the determinants of the Ebola epidemic in Chapter 4 through a generalised linear model framework coupled with Bayesian stochastic search variable selection (BSSVS) to assess the relative importance climatic and socio-economic variables on EVD number of cases.
+In Chapter 5 I tackle the question of whether a particular glycoprotein mutation could lead to increased  human mortality from EVD.
+I show that a principled analysis of the available data that accounts for several sources of uncertainty as well as shared ancestry between samples does not allow us to ascertain the presence of such effect of a viral mutation on mortality.
+Chapter 6 attempts to bring the findings of the thesis together and discuss how the field of phylodynamics, in special its methodological aspect, might move forward.
