@@ -197,7 +197,7 @@ See Box~\ref{alg:stl} for details.
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[scale=0.25]{\dir/figs/STL_new.pdf} 
+\includegraphics[scale=0.20]{\dir/figs/STL_new.pdf} 
 \end{center}
 % \begin{center}
 % \subfigure[\textbf{Symmetric example}]{\includegraphics[scale=0.4]{\dir/figs/STL_new.pdf} }%
@@ -298,6 +298,7 @@ Moreover,
 It is possible, however, to have pairs of distinct points $\{t, \boldsymbol a\}$ and $\{t^\ast, \boldsymbol a\}$ such that $\psi( \{t, \boldsymbol a\}) = \psi(\{t^\ast, \boldsymbol a\}) = \{\boldsymbol s, \boldsymbol k\}$.
 To see this, consider the diagram in Figure~\ref{fig:cexample}, which shows two distinct phylogenies with the same intercoalescent intervals and numbers of lineages, for which the prior measure is the same but the likelihood would not be.%TODO more explanation
 \end{proof}
+
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=0.65]{\dir/figs/counter_example_mapping.pdf}
@@ -571,7 +572,7 @@ Overall, I believe it is possible to claim that both SubTreeJump and SubTreeLeap
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=\textwidth, height = 15cm]{\dir/figs/TreeProbabilities_5taxa.pdf}
+\includegraphics[scale=0.75]{\dir/figs/TreeProbabilities_5taxa.pdf}
 \caption[Tree probabilities obtained by sampling from the prior with each transition kernel.]{\textbf{Tree probabilities obtained by sampling from the prior with each transition kernel}.
 For each tree kernel, we present the estimated probabilities for each of the $105$ possible trees on $5$ taxa from a sample of $M = 1, 000, 000$  trees.
 On the x-axis, we present the true probabilities, computed from a sample of $K = 100, 000$ trees from the coalescent prior by direct simulation.
@@ -584,7 +585,7 @@ Colours show the three possible tree shapes for $5$ taxa.
 %%%
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=\textwidth, height = 15cm]{\dir/figs/CladeFrequencies_5taxa.pdf}
+\includegraphics[scale=0.75]{\dir/figs/CladeFrequencies_5taxa.pdf}
 \caption[Clade probabilities obtained by sampling from the prior with each transition kernel.]{\textbf{Clade probabilities obtained by sampling from the prior with each transition kernel}.
 We used the same sample of $1$ million trees to compute clade frequencies to compute the clade frequencies.
 On the x-axis, we present the true clade probabilities, computed from a the same sample from the prior as before.
@@ -611,7 +612,7 @@ To be able to sample with SubTreeJump, we need to combine it with branch length 
 %%%
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=\textwidth, height = 15cm]{\dir/figs/NE_ratioP_vs_ratioMargLike_40L_1Biter.pdf}
+\includegraphics[scale=0.75]{\dir/figs/NE_ratioP_vs_ratioMargLike_40L_1Biter.pdf}
 \caption[Log posterior probabilities versus marginal (log) likelihoods.]{\textbf{Log posterior probabilities versus marginal (log) likelihoods}.
 We plot $\log P_i - \log P_j$ against $(\log l_i - \log l_j) + (\log \pi(T_i) - \log\pi(T_j)$ for the default mix and SubTreeLeap.
 Points are coloured according to their rspr distance to the true tree.
@@ -623,7 +624,7 @@ Notice that distance zero means the true tree, used to be simulate the data.
 %%% 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=\textwidth, height = 15cm]{\dir/figs/ratioP_vs_ratioMargLike_40L_1Biter.pdf}
+\includegraphics[scale=0.75]{\dir/figs/ratioP_vs_ratioMargLike_40L_1Biter.pdf}
 \caption[Ratios of posterior probabilities of the trees against the ratio of their marginal likelihoods.]{\textbf{Ratios of posterior probabilities of the trees against the ratio of their marginal likelihoods.}
 In this figure we show the (log) ratios as proposed by~\cite{Hoehna2008}.
 All computations as in Figure~\ref{fig:logP}.
@@ -797,7 +798,7 @@ In the following sections I will use these target distributions to evaluate the 
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[scale=0.6]{\dir/figs/golden_targets.pdf} 
+\includegraphics[scale=0.55]{\dir/figs/golden_targets.pdf} 
 \end{center}
  \caption[Distance to true golden true tree for several data sets and distance metrics (targets).]{\textbf{Distance to true golden true tree for several data sets and distance metrics (targets).}
  In Panels A and B I show distances that account only for topology differences (\cite{Robinson1981} and~\cite{Kendall2016} (KC) with $\lambda = 0$), whereas panels C, D and E display the distributions of metrics that take branch lengths into account, in the form of the Steel-Penny~\citep{Steel1993}, clade distance (CD) and rooted branch score (BS), see Chapter 3 for definitions.
@@ -861,6 +862,7 @@ The smaller the distance attained, the better the estimates of the mean under a 
 The results show that \verb|STL| and \verb|STX| achieve lower distances and thus higher efficiency of sampling, for both data sets considered.
 For the larger data set, with 90 taxa, the difference in performance is even larger (Figure~\ref{fig:distance_true_denv2_mean}).
 These patterns remain more or less constant across metrics (e.g. KC, RF or SP), suggesting \verb|STX| outperforms the other MCMC schemes for both topology and branch length estimation. 
+
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.6]{\dir/figs/distance_true_denv4env_mean.pdf} 
@@ -871,6 +873,7 @@ These patterns remain more or less constant across metrics (e.g. KC, RF or SP), 
   Vertical tiles show different metrics and the dashed lines show the average distances to the true tree computed from the golden runs, i.e. the expectations of the target distributions shown in Figure~\ref{fig:target_golden}.
  \label{fig:distance_true_denv4_mean}
 \end{figure}
+
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.6]{\dir/figs/distance_true_denv2env_mean.pdf} 
@@ -889,6 +892,7 @@ From Figure~\ref{fig:ESS_distance_true} we can see that while \verb|STL| display
 This result seems to be consistent also for simulated data (see Figure~\ref{sfig:ess_true_50taxa}).
 It seems also that as tree size grows the scaling of \verb|STX| becomes more important, as evidenced by some of the ESS from the default set of operators being below the common threshold of $200$ for some metrics (e.g. the KC metric with $\lambda = 0$).
 If the one-dimensional projections of phylogenetic space provided by the target distributions shown in~\ref{fig:target_golden} are taken to be faithful representations of the original space then the results above indicate that \verb|STL| and \verb|STX|  allow more efficient sampling, not only in terms of distance to the true tree but also in number of effective samples per MCMC iteration.
+
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.6]{\dir/figs/ESS_distance_true.pdf} 
@@ -906,9 +910,10 @@ The results in Figure~\ref{fig:mixing_clades} show several measures of performan
 In theory, these measures should agree, since they are essentially measuring how quickly the chain explores clade space by visiting each clade proportional to its posterior probability; the faster the switching rate, the higher the ESS (see section~\ref{sec:cladeSwitch} in Chapter 3 for a discussion).
 And we see that these quantities do agree and show that \verb|STL| and \verb|STX|  outperform the other schemes, specially for the larger data set.
 On the other hand, the plots in Figure~\ref{fig:mixing_clades}E show that the two new schemes visit slightly fewer clades, but the difference seems to be smaller for the larger data set (see extended discussion).
+
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[scale=0.6]{\dir/figs/mixing_clades.pdf} 
+\includegraphics[scale=0.55]{\dir/figs/mixing_clades.pdf} 
 \end{center}
  \caption[Measures of mixing in clade space for several MCMC schemes.]{\textbf{Measures of mixing in clade space for several MCMC schemes.}
   Boxplots show the results of $100$ replicates per data set.
@@ -929,6 +934,7 @@ The results show that while all MCMC schemes (operator mixes) perform comparably
 I first looked at the fraction of the chain that, when removed as warm-up (burn-in), maximises the ESS, for a selection of continuous parameters (see Section~\ref{sec:performance_methods}), taking the maximum fraction across parameters as the measure for a particular run -- again, a conservative performance assessment.
 The results are shown in Figure~\ref{fig:optimal_burnin} and reveal a slight advantage for \verb|STL| and \verb|STX| for the larger data set (DENV-2, 90 taxa).
 Overall, however, this performance measure does not indicate substantial superiority of the new proposed schemes over the default.
+
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.45]{\dir/figs/optimal_warmup.pdf} 
