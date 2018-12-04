@@ -25,7 +25,7 @@ Our solution entails an adaptive operator, SubTreeLeap (\verb|STL|) that simulta
 I show that this operator leads to better mixing not only in phylogenetic space but also for continuous parameters that depend on the phylogeny.
 Results were particularly encouraging for a very challenging data set of 1610 complete EBOV genomes.
 I also found, however, that \verb|STL| can suffer with premature adaptation, leading to the chain being stuck at a mode and hence poor sampling of the target.
-This issue is mostly ameliorated by combining \verb|STL| with \verb|STJ|, another operator developed in this thesis and that can help the chain jump between modes.
+This issue is almost completely ameliorated by combining \verb|STL| with \verb|STJ|, another operator developed in this thesis and that can help the chain jump between modes.
 
 Chapter 2 also details some new tools I developed in order to better evaluate MCMC performance for phylogenies.
 For example, I expand on the the idea put forth by~\cite{Lanfear2016} and propose obtaining a golden tree from independent, long golden runs~\citep{Hoehna2008,Lakner2008} and then computing the distribution of the distance to this golden tree under several metrics and then using these distributions as a (univariate) representation of the desired target.
@@ -56,11 +56,11 @@ The efforts by~\cite{Billera2001},~\cite{Gavryushkin2016} and~\cite{Whidden2017}
 Phylogenetic space admits both discrete (``discrete tree space in~\cite{StJohn2017}) and continuous (``continuous tree space) representations, none of them canonical.
 While these capture distinct features the inter-dependence between topology and branch lengths means that any geometrical understanding of phylogenetic space needs to come accompanied by some natural traversing metric.
 The Billera-Vogtmann-Holmes (BHV)~\citep{Billera2001} space admits unique geodesics and allows for the definition of quantities such as expectations and variances, and appears as a strong candidate for a canonical representation of phylogenetic space.
-The ``stickiness  of the mean -- that is perturbing a sample of trees may very well not change their mean tree -- and the sharpness (lack of differentiability) at the boundaries are important shortcomings, however. 
+The ``stickiness''  of the mean -- that is perturbing a sample of trees may very well not change their mean tree -- and the sharpness (lack of differentiability) at the boundaries are important shortcomings, however. 
 
 Very recent developments have brought the promise of a more a natural representation of phylogenetic space in $\mathbb{R}^d$ in the form of the log map of~\cite{Barden2018}.
 The log map allows for a representation of the BHV space that not only allows for expectations and variances but also admits rotations\footnote{And preserves directionality.} and thus opens up the possibility for computing (defining) covariances and hence prove central limit theorems in this space.
-This new representation has already been used successfully to quantity uncertainty in phylogenetic estimates in a paper by~\cite{Willis2017}.
+This new representation has already been used successfully to quantify uncertainty in phylogenetic estimates in a paper by~\cite{Willis2017}.
 It is possible that these new results could be combined with the work of~\cite{Nye2015} on Brownian motion in phylogenetic space to design more efficient sampling methods.
 The crucial insight is that, as argued by~\cite{StJohn2017}, a better understanding of the structure of phylogenetic space can not only improve search  algorithms -- be them for optimisation or sampling -- but also the analysis of MCMC output.
 The core idea here is that we need better~\textbf{statistical} representations (see~\cite{Holland2013}) of phylogenetic space so we can leverage tools from data analysis and visualisation to study phylogenies.
@@ -83,8 +83,8 @@ This constitutes a possibility for future research.
 
 The main concern in Chapter 5 was to properly accommodate uncertainty -- not just phylogenetic -- in order to evaluate the association between a particular mutation on the virus and the outcome of EVD~\citep{Diehl2016}.
 This was accomplished by tackling the same question from several angles, employing different statistical models.
-I used a  phylogenetic Brownian motion model to study the relationship between viral load and phylogeny, as way of gaining insight into how this covariate -- which is strongly associated with the outcome -- varies along the underlying phylogeny.
-In addition, I fit phylogenetic regression models that account for shared ancestry between observations and therefore are conceptually superior to i.i.d models.
+I used a  phylogenetic Brownian motion model to study the relationship between viral load and phylogeny, as a way of gaining insight into how this covariate -- which is strongly associated with the outcome -- varies along the underlying phylogeny.
+In addition, I fit phylogenetic regression models that account for shared ancestry between observations and therefore are conceptually superior to i.i.d models in this particular setting.
 In this instance, I could have built a full joint model in a manner similar to the approach of~\cite{Cybis2015}, who build a latent liability model that models a latent variable through Brownian motion and apply the appropriate transformation in order to be able to condition on the data at the tips\footnote{In this case any of the link functions commonly associated with binary regression would be suitable.}.
 
 As stated in Chapter 1, proper appreciation of phylogenetic uncertainty, more specifically propagating phylogenetic uncertainty to parameter estimates, is at the heart of Bayesian phylodynamic inference.
@@ -157,7 +157,7 @@ Coupled with successes in the analyses of large collections of serially-sampled 
 Initiatives such as \verb|nextstrain| (\url{http://nextstrain.org/}, \cite{Hadfield2017}) have shown that it is possible to not only curate existing information publicly available on GenBank (\url{https://www.ncbi.nlm.nih.gov/genbank/}) but also provide powerful visualisation capabilities that combine the output of complex phylogenetic/phylodynamic models running under the hood with maps and colours to display information in usable form.
 Recently, the \verb|ARTIC| network (\url{http://artic.network/}) has been formed to develop, in their own words, ``an end-to-end system for processing samples from viral outbreaks to generate real-time epidemiological information that is interpretable and actionable by public health bodies.'' 
 
-Apart from further development in the logistics of deploying the sequencing apparatus in the field -- the ``lab in a suitcase'' -- the success of this initiative will hinge on having the computational capabilities for processing the data (bioinformatics), drawing inference (statistics) and conveying information in a useful way (visualisation).
+Apart from further development in the logistics of deploying the sequencing apparatus in the field -- the ``lab in a suitcase'' -- the success of this initiative will hinge on having the computational capabilities for processing the data (Bioinformatics), drawing inference (Statistics) and conveying information in a useful way (visualisation).
 On the statistical side, sequential Monte Carlo (SMC) methods are at the forefront of Bayesian on-line phylogenetic inference~\citep{Dinh2016,Fourment2017,Everitt2018}.
 Much conceptual work is needed in order to ensure that phylogenies built when one (or a few) taxa are added at a time are accurate and I see the development of heuristics for taxa placement as a promising way of shortening convergence times in sequential analyses.
 
