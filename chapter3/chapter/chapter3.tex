@@ -17,7 +17,7 @@ Discrete, high-dimensional parameter spaces such as those encountered in phyloge
 In her review of the geometry of tree space, \cite{StJohn2017} argues that the power of the tree/phylogeny model ``comes from the property that adds the complexity: the vast number of trees to explain different possible evolutionary scenarios'' (pg e83).
 As argued by~\cite{Drummond2015}, the complexity of phylogenetic space can be seen as a major reason for the development of specialised software for Bayesian phylogenetics as opposed to the use of common Markov Chain Monte Carlo (MCMC) packages such as Stan~\citep{Carpenter2017} and JAGS~\citep{Plummer2003}. 
 
-Available methods for diagnosing convergence of MCMC for Bayesian phylogenetics include tracking clade (split) frequencies both within and between chains~\citep{Nylander2008}, multi-dimensional scaling of tree distance matrices~\cite{Hillis2005,Matsen2006} and network-based clustering~\citep{Whidden2015}. 
+Available methods for diagnosing convergence of MCMC for Bayesian phylogenetics include tracking clade (split) frequencies both within and between chains~\citep{Nylander2008}, multi-dimensional scaling of tree distance matrices~\citep{Hillis2005,Matsen2006} and network-based clustering~\citep{Whidden2015}. 
 These methods are mostly graphical in nature, and only recently have more formal convergence metrics been proposed~\citep{Whidden2015,Lanfear2016}.
 An important thing to notice is that it is not possible to say with complete certainty when a Markov chain has converged to its target distribution.
 Rather, convergence tools are designed to identify failure to converge.
@@ -29,7 +29,7 @@ An additional issue with currently available methods is that most assume either 
 While~\cite{Warren2017} attempt to integrate most of the popular visualisation methods -- along with some quantitative indicators -- into one framework, their approach is infeasible for large time-calibrated phylogenies.
 
 This chapter is a companion to Chapter 2, where I discuss transition kernels for Metropolis-Hastings MCMC and employ several of the methods described/developed here to assess convergence and performance.
-My goal here is to expand upon their approach and make the necessary adaptations to accommodate time-calibrated trees with hundreds of taxa.
+My goal here is to expand upon the approach of~\cite{Warren2017} and make the necessary adaptations to accommodate time-calibrated trees with hundreds of taxa.
 In what follows I review  some key concepts in Bayesian phylogenetics as well as the state-of-the-art for convergence diagnostics in MCMC applied to Bayesian phylogenetics.
 I then proceed to discuss the limitations of available methods when dealing with time-calibrated trees and suggest adaptations.
 My ultimate goal is to investigate a statistically useful representation of tree space and develop an analysis pipeline that can aid practitioners diagnose their MCMC runs when performing phylodynamic analyses for the increasingly larger data sets found in practice.
@@ -41,7 +41,7 @@ A key step in characterising phylogenetic space is constructing valid metrics on
 A tree (phylogeny) metric is a mapping $d_\sigma : \boldsymbol \Psi \times \boldsymbol \Psi \to [0, \infty)$ that satisfies (i) $d_\sigma(u, v) \geq 0$; (ii) $d_\sigma(u, v) = 0 \iff u = v$;  (iii) $d_\sigma(u, v) = d_\sigma(v, u)$ and (iv) $d_\sigma(u, w) \leq d_\sigma(u, v) + d_\sigma(v, w)$ for any pair of trees $u, v$. 
 For convenience, I let $\sigma$ be an indexing parameter so that we can distinguish between different metrics and study their properties.
 
-A comprehensive review of available tree metrics would be infeasible.
+A comprehensive review of available tree metrics would be out of the scope of this chapter.
 Instead, I review a few important metrics that capture different aspects of phylogenetic space.
 \cite{Robinson1981} propose a metric to compare unrooted tree topologies based on a tree operation $\alpha(u, v)$ that removes (contracts) all edges from $u$ that are not present in $v$, creating $u \wedge v$.
 The reverse operation $\alpha^{-1}$ in turn adds edges to $u \wedge v$ to create $v$.
@@ -63,22 +63,22 @@ Let $d_{ij}^\tau$ be the sum of branch lengths separating tips $i$ and $j$ in ph
 The SP metric computes the squared differences of path lengths by two trees $x$ and $y$ as $d_{\text{SP}}(x, y) = \sqrt{\sum_{1 \leq i \leq j \leq n} (d_{ij}^x - d_{ij}^y)^2 }$.
 
 \cite{Kendall2016} proposed a new metric that can be thought of as a compromise in terms of applicability and computational complexity and that allows for the comparison of topology and branch lengths at the same time by cleverly encoding the phylogenies.
-For a phylogeny $u$, define $m_{i,j}$ to be the first node which is simultaneously the parent of $i$ and $j$,~\textit{i.e.}  $m_{i,j}$ is the most recent common ancestor (MRCA) of $i$ and $j$.
-Then we are prepared to construct the vector with all $n(n-1)/2$ unique pairs of MRCAs, supplemented by $n$ entries with value $1$ at the end,  $\boldsymbol m(u) = \{ m_{1,2}, m_{1, 3}, \ldots, 1, 1, \{ $n$\:\text{times} \}, 1 \}$.
+For a phylogeny $u$, define $m_{i,j} \in V_u$ to be the first node which is simultaneously the parent of $i$ and $j$,~\textit{i.e.}  $m_{i,j}$ is the most recent common ancestor (MRCA) of $i$ and $j$.
+Then we are prepared to construct the vector with all $n(n-1)/2$ unique pairs of MRCAs, supplemented by $n$ entries with value $1$ at the end,  $\boldsymbol m(u) = \left( m_{1,2}, m_{1, 3}, \ldots, 1, 1, \{ n\:\text{times}  \}, 1 \right)$.
 Let $W_{i,j}$ be the branch length associated with $m_{i,j}$ and define $l_i$ to be the root-to-tip path length for tip $i$ in $u$.
-Then we can define\footnote{Hence $|\boldsymbol m(u)| = |\boldsymbol W(u)| = n(n+1)/2$.} $\boldsymbol W(u) = \{W_{1,2}, W_{1,3}, \ldots, l_1, \ldots, l_n \}$.
+Then we can define\footnote{Hence $|\boldsymbol m(u)| = |\boldsymbol W(u)| = n(n+1)/2$.} $\boldsymbol W(u) = \left( W_{1,2}, W_{1,3}, \ldots, l_1, \ldots, l_n \right)$.
 For $ 0 \leq \lambda  \leq 1$ we can combine topology and branch length and encode the phylogeny $u$~\textit{via} the vector $\boldsymbol\eta_\lambda(u) = (1-\lambda)\boldsymbol m(u) + \lambda \boldsymbol W(u)$.
 Finally, we are prepared to define the Kendall-Colijn (KC) metric between two phylogenies $u$ and $v$ as $d_\lambda^{\text{KC}}(u, v) = ||\boldsymbol\eta_\lambda(u) -\boldsymbol\eta_\lambda(v)||$, where $||\cdot||$ is the the Euclidean or $L^2$ norm.
 This metric combines topology and branch lengths, is continuous for any $\lambda \in [0, 1]$ and is straightforward to compute, specially when compared with the BHV and SPR metrics.
 
 Finally, I describe two other metrics specifically designed for time-calibrated trees.
-The first, which I shall call the clade-difference (CD) metric, asks for two phylogenies $\tau_A$ and $\tau_B$, how many different clades there exist and how different their heights are.
+The first, which I shall call the clade-difference (CD) metric, takes two phylogenies $\tau_A$ and $\tau_B$ and asks how many different clades there exist between them and how different their heights are.
 More formally, let $\boldsymbol C(x)$ be the set of clades of phylogeny $x$.
 Then the CD metric can be defined as follows: for each clade $c_i \in \boldsymbol C(\tau_A)$, compute the height of the MRCA between the constituents of $c_i$ in $\boldsymbol C(\tau_B)$, $m_i$ and the corresponding clade in $\tau_A$.
 Repeating the same procedure for $\tau_B$ we can then compute:
 $$ d_{\text{CD}} (\tau_A, \tau_B) = \sqrt{  \sum_i\left[ \left(h(c_i) - h(m_i) \right)^2 \right]  + \sum_j \left[ \left(h(c_j) - h(m_j)\right)^2 \right].  } $$
 The idea behind CD is to quantify big topological differences such that  if a clade moves  across the tree, the metric will penalise both the difference between the height of that node and the root in $\tau_A$ and back down to the height of the corresponding node in $\tau_B$.
-The second metric is the rooted branch score (BS) was proposed by~\cite{Heled2010} and computes the Euclidean distance in branch lengths between shared clades.
+The second metric is the rooted branch score (BS) proposed by~\cite{Heled2010} which computes the Euclidean distance in branch lengths between shared clades.
 Let $b(\tau, c)$ be the length of the branch subtending $c$ in $\tau$ if $c \in \boldsymbol C(\tau)$ and $0$ otherwise.
 Then we are prepared to define
 $$d_{\text{BS}}(\tau_A, \tau_B) = \sqrt{ \sum_{c \in \boldsymbol C(\tau_A) \cup \boldsymbol C(\tau_B) } \left( b(\tau_A, c) - b(\tau_B, c) \right)^2 }  .$$
@@ -101,7 +101,7 @@ These include evolutionary and migration rates, Markov evolutionary model parame
 Fortunately, this kind of parameter is the standard in models used in the statistical literature at large, which means there is a large body of work on how to detect convergence for continuously-defined quantities in MCMC (see~\cite{Cowles1996} and~\cite{Mengersen1999} for reviews).
 
 Let $\boldsymbol\theta = \{\theta^{(1)}, \theta^{(2)}, \ldots, \theta^{(M)}\}$ be a collection of $M$ samples from a single run of MCMC.
-Since from a Bayesian perspective all computations should be done from the target posterior $\pi$ (see Chapter 1), we need to make sure that $\boldsymbol\theta$ is a sample from that distribution.
+Since from a Bayesian perspective all computations should be done from the target posterior $p$ (see Chapter 1), we need to make sure that $\boldsymbol\theta$ is a sample from that distribution.
 The first thing to notice is that the samples in $\boldsymbol\theta$ are~\textit{correlated} and hence do not constitute a proper sample from the target.
 Hence we need to quantify the amount of~\textit{autocorrelation} between the samples, which in turn will give us an estimate of the~\textit{effective} number of samples from $\pi$ contained in $\boldsymbol\theta$, \textit{i.e.} for any $n \leq M$ we want to assess the dependence between $\theta^{(n)}$ and $\theta^{(n + 1)}$.
 I will now make these statements precise, following the notation of~\cite{Geyer2011} as much as possible, occasionally borrowing from the Stan manual~\citep{StanTeam2017} as well.
@@ -130,8 +130,9 @@ which captures the number of samples in the MCMC sample $\boldsymbol\theta$ that
 In Bayesian phylogenetics practice, ESS is at the core of most convergence assessment -- for continuous parameters --, the common recommendation being that all parameters in a MCMC run have $n_{\text{eff}} > 200$.
 The rationale for this recommendation seems to be that the variability in most quantities of interest is such that a sample size of $200$ should allow for precise computation of most functionals.
 In this chapter I will use the \verb|effectiveSize()| in the~\textbf{coda} package~\citep{Plummer2006} and the routines in the package Tracer v1.7~\citep{Rambaut2018} to compute ESSs.
+Note however that while the ESS is a useful tool for assessing mixing, it is designed to deal with one chain (run) at a time.
 
-While the ESS is a useful tool for assessing convergence, it is designed to deal with one chain (run) at a time.
+With respect to~\textit{convergence} to the target distribution, however, ESS may be misleading in the sense  that chain stuck in a mode can have high ESS but has not converged to the target distribution because it has not adequately explored all of the modes proportional to their probability.
 A powerful technique for assessing convergence is to run several parallel chains from overdispersed starting points and determine whether they converge to the same distribution.
 Suppose $K$ runs of $M$ iterations each are available, \textit{i.e.}, we have $\boldsymbol\theta_i, i = 1, 2, \ldots K$.
 The between sample variance can be written as
@@ -162,10 +163,10 @@ For $M$ samples, the mESS is defined as :
  n_{\text{eff}}^m = M\left(\frac{\text{det}(\boldsymbol\Lambda)}{\text{det}(\boldsymbol\Sigma)}\right)^{1/p},
 \end{equation}
 where $p$ is the number of parameters under analysis and $\text{det}(\boldsymbol\Lambda)$ and $\text{det}(\boldsymbol\Sigma)$ are the determinants of the sample covariance matrix and the Monte Carlo covariance matrix, respectively.
-Notice that similar to the ESS, when samples are independent, $\boldsymbol\Lambda = \boldsymbol\Sigma$ and hence $ n_{\text{eff}}^m = M$.
+Notice that similarly to the ESS, when samples are independent, $\boldsymbol\Lambda = \boldsymbol\Sigma$ and hence $ n_{\text{eff}}^m = M$.
 Routines to compute the mESS are implemented in the R package~\textbf{mcmcse}~\citep{Flegal2017}.
 
-Notice that these procedures can be used to determine the lower bound on the multivariate ESS to achieve a certain level of confidence.
+These procedures can also be used to determine the lower bound on the multivariate ESS to achieve a certain level of confidence.
 If $\epsilon$ is the fraction of the variance due to Monte Carlo error and we would like to collect enough samples to have $(1-\alpha)\times 100 \%$ confidence, the bound becomes
 \begin{equation}
  \label{eq:mESSbound}
@@ -254,7 +255,7 @@ It should be noted that under mild regularity conditions, the techniques describ
 One could, for instance, compute the univariate ESS for each clade of interest as a way of quantifying mixing, taking the minimum across clades as a conservative metric, or the average as a more balanced statistic. 
 
 Both the clade switching score above and univariate ESS ignore the non-trivial dependence structure between clades and thus might not accurately reflect chain mixing.
-In principle, the multivariate ESS (mESS,~\cite{Vats2015}) described in Chapter 3 could also be computed as a global metric that takes correlation between clades into account.
+In principle, the multivariate ESS (mESS,~\cite{Vats2015}) described in section~\ref{sec:continuous} could also be computed as a global metric that takes correlation between clades into account.
 Understanding the correlation structure between clades is therefore important and here I offer a sketch for a more complete characterisation of the correlation structure under the  coalescent prior.
 
 The correlation structure of any sample of clades $\boldsymbol X = \{\boldsymbol X_1, \ldots, \boldsymbol X_K \}$ is non-trivial, due to clades being incompatible or nested.
@@ -300,7 +301,7 @@ To facilitate visualisation of the structure in the matrix, I sorted clades by s
 
 One way of visualising phylogenetic space is by employing lower-dimension projections that attempt to embed it in Euclidean space.
 A very popular technique for this purpose is multi-dimensional scaling (MDS, \cite{Hillis2005}) of phylogenetic distances, in which the idea is to construct a new space with a few (usually two) dimensions that captures most of the features (variability) of the original space.
-Suppose $\boldsymbol D$ is a phylogenetic distance matrix $D_{ij}$ is the distance -- under a particular distance $d_\sigma$ -- between two  phylogenies $i$ and $j$.
+Suppose $\boldsymbol D$ is a phylogenetic distance matrix where $D_{ij}$ is the distance -- under a particular metric $d_\sigma$ -- between two  phylogenies $i$ and $j$.
 MDS proceeds by finding points $\boldsymbol x = \{x_1, x_2, \ldots, x_P\}$ such that a~\textbf{stress function}~\citep{Kruskal1964}\footnote{Other stress functions are possible, I keep the Kruskal-1 function here for simplicity and comparability with~\cite{Hillis2005}.}:
 \begin{equation}
  \label{eq:stressF}
@@ -328,7 +329,7 @@ Moreover, since 2-d visualisations are so much easier to understand, practitione
 \label{sec:graph}
 
 Another useful way of representing the discrete (tree) component of phylogenetic space is equipping it with a metric $d_\sigma$ and constructing a graph $G_\delta(V_n, E_n)$ where each vertex corresponds to a tree topology and there is an edge between two edges (trees) if they are a distance $d_\sigma \leq \delta$ apart under the chosen metric.
-Thus, for this ``meta-graph'', $|V_n| = |\boldsymbol T| = (2n-3)!!$ and $|E_n| \leq |V_n| (|V_n| - 1)/2$, although this last bound is very crude and can be refined for a given $d$ and $\delta$.
+Thus, for this ``meta-graph'', $|V_n| = |\mathbb{F}| = (2n-3)!!$ and $|E_n| \leq |V_n| (|V_n| - 1)/2$, although this last bound is very crude and can be refined for a given $d$ and $\delta$.
 Common choices for metric include the nearest-neighbour interchange (NNI) and subtree prune-and-regraft (SPR) distances.
 In particular,~\cite{Whidden2015} show how one can construct the SPR graph of a sample of trees and then use graph-theoretic tools to quantify exploration of phylogenetic space. 
 Starting from a sample of trees $\boldsymbol \tau = \{\tau_1, \tau_2, \ldots, \tau_M\}$, the analysis pipeline proposed by~\cite{Whidden2015} can be summarised as follows:
@@ -351,20 +352,20 @@ Starting from a sample of trees $\boldsymbol \tau = \{\tau_1, \tau_2, \ldots, \t
 \textbf{Limitations}
 
 One of the advantages of building $\boldsymbol G$ using SPR distances is that many of its theoretical properties are better studied~\citep{Whidden2017}.
-On the other hand, focusing on SPR distances disregards branch lengths, which is not always desirable, specially when dealing with time-calibrated phylogenies (see below).
+On the other hand, focussing on SPR distances disregards branch lengths, which is not always desirable, specially when dealing with time-calibrated phylogenies (see below).
 Perhaps a more serious flaw with the SPR-graph approach is that for large $n$,  each tree visited in the MCMC is likely to be unique, and hence one cannot construct $\boldsymbol \tau_{\text{top}}$ based on posterior frequencies.
 
 \subsection{Effective sample size and potential scale reduction factor for phylogenies}
 \label{sec:treeESS}
 
 Recently, researchers have also extended the concepts of effective sample size (ESS) and potential scale reduction factor (PSRF) to tree topologies, taking advantage of the fact that these quantities are defined w.r.t. the L$^2$ in Euclidean space.
-\cite{Lanfear2016} propose two ESS-like metrics:  (i) the topological \textbf{approximate ESS}, $n_{\text{eff}}^T$ and (ii) the \textbf{pseudo-ESS}, $n_{\text{eff}}^P$.
+\cite{Lanfear2016} propose two ESS-like metrics:  (i) the \textbf{pseudo-ESS}, $n_{\text{eff}}^P$ and (ii) the topological \textbf{approximate ESS}, $n_{\text{eff}}^T$.
 If we define $\tau_f$ to be a focal tree and let $\boldsymbol L = \{l_1, l_2, \ldots, l_M \}, \: l_i = d_\sigma(\tau_i, \tau_f)$, the pseudo-ESS is simply the ESS of $\boldsymbol L$  computed as defined above (Eq~\ref{eq:ESSb}).
 In other words, this measure attempts to reduce phylogenies to a univariate continuous quantity for which the methods discussed in Section~\ref{sec:continuous} can be applied.
 An advantage of this approach is that it admits any choice of metric $d_\sigma$, which in turn means one can use metrics that account for branch lengths and topology simultaneously.
 A perhaps more principled approach is to try to directly estimate the autocorrelation spectrum for phylogenies.
 Let $d$ be the squared distance between two independent phylogenies.
-The expected value of $d$ with $N$ independent samples is $(N(N-1)/4N^2)d$ and we can estimate $N$ when our sample has $M$ sequential observations by noting that 
+The expected value of $d$ with $N$ independent samples is $(N(N-1)/4N^2)d$ and we can estimate $N$ (as $n_{\text{eff}}^T$) when our sample has $M$ sequential observations by noting that 
 \begin{align}
 \label{eq:topoApproxESS}
 \frac{N(N-1)}{4N^2} = \frac{\sum_{i = 1}^{M-1} \sum_{k = 1}^{\text{min}(m, M-i)}f(k)  + \frac{1}{2}(M-m + 1)(M-m)d}{2M^2},&\\
@@ -389,7 +390,7 @@ As with the original PSRF, $\hat{R}^\prime$ approaches 1 as the $K$ independent 
 According to~\cite{Lanfear2016}, the pseudo-ESS can be sensitive to the choice of focal tree.
 While that could be remedied in principle by choosing, for instance, the maximum clade credibility (MCC) phylogeny as $\tau_f$, it is unclear to me what biases this could introduce.
 The original formulation of~(\ref{eq:PSRF-phylo}) by~\cite{Whidden2015} considered only SPR distances, but this can be easily generalised to other distances that include branch lengths.
-A minor point about these diagnostics is that due to their recent development in-depth theoretical and empirical studies are still lacking.
+A minor point about these diagnostics is that due to their recent development, in-depth theoretical and empirical studies are still lacking.
 For instance, the choice of metric might play an important role in the power to detect convergence problems, but this aspect remains to be investigated.
 
 \subsection{A word of caution}
@@ -417,7 +418,7 @@ Considering the methods currently available, the main difficulties faced when ex
 Most routines in AWTY are designed for unrooted trees and implicitly assume a relatively small number of taxa ($n < 50$).
 Moreover, the MDS routines presented in~\cite{Hillis2005} and available in the~\textbf{RWTY} package use the Robinson-Foulds distance which does not capture branch length differences and hence is not appropriate for time-calibrated phylogenies if used in isolation.
 The routines available in the~\textbf{RWTY} package also use RF as the default metric, and as far I am aware, the only metric that includes branch lengths available in the package is path distance (BS, see Section~\ref{sec:metrics}).
-Here I relax this by including many other metrics (see below), for which the approximate ESS of~\cite{Lanfear2016} can be computed following equation~(\ref{eq:topoApproxESS}).
+Here I relax this by including many other metrics (see below), for which the approximate ESS of~\cite{Lanfear2016} can be computed using equation~(\ref{eq:topoApproxESS}).
 As the number of taxa grows, it gets progressively harder to track clades, both from a statistical and a computational point of view.
 Computationally, it becomes cumbersome to compute indicators for all clades in a run, in addition to plotting clade frequencies.
 This latter problem can be tackled by only paying attention to clades with a particular (posterior) frequency.
@@ -449,7 +450,7 @@ The same strategy can be adopted when processing clade frequencies: I used the c
 As mentioned above, I employ the packages~\textbf{mcmse}~\citep{Flegal2017} and~\textbf{coda}~\citep{Plummer2006} to compute (univariate and multivariate) effective sample sizes and potential scale reduction factors for continuous parameters.
 This is done to keep all computations contained in the R environment, which allows the whole workflow to be encapsulated into a (R)Markdown document which can be rendered to html and/or PDF (see Figure~\ref{fig:pipeline}).
 A suite of R and bash scripts -- as well as the RMarkdown report --  to perform these tasks is available from~\url{https://github.com/maxbiostat/BEAST_convergence_pipeline}\footnote{If these functions prove to be sufficiently useful to other researchers, I may build an R package.}.
-For convenience, the analysis of the ``poor'' runs is included in Appendix A as an example.
+For convenience, the analysis of the ``poor'' runs (see below) is included in Appendix A as an example.
 \begin{figure}[!ht]
 \begin{center}
   \subfigure[\textbf{Continuous parameters}]{\includegraphics[scale=0.35]{\dir/figs/pipeline_screenshot.pdf}}%
@@ -479,7 +480,7 @@ All runs had 10 million iterations and a thinning interval of a thousand states.
 \subsection{Simulated data}
 \label{sec:simudata}
 
-I also created a simulated data set to have a baseline where we know the ground truth.
+I also created a simulated data set in order to have a baseline where we know the ground truth.
 I first obtained a 50 taxa subtree with uniformly temporally sampled tips from a larger EBOV phylogeny~\citep{Dudas2017}, henceforth called ``empirical tree''.
 To assess the effect of tree shape, I simulated a coalescent tree with the same tip-date sampling structure under a constant population model with $N_e = 10$, which I will call ``coalescent tree''.
 I then simulated alignments of 1,000, 5,000 and 10,000 sites down both trees with a substitution rate of $10^{-3}$ substitutions per site per year, generating 6 alignments.
@@ -513,7 +514,7 @@ $^1$ - First (log) population  from Skygrid.
 $^2$ - The ratio between the average rate and the standard deviation of rates across all branches.
 $^3$ - Covariance between rate assignments in the tree.
 $^4$ - Multivariate ESS as in~\cite{Vats2015} and multivariate potential scale reduction factor (PSRF).
-The minimum multivariate ESS for all parameters considered is $8831$ according to the formula in~(\ref{eq:mESSbound}).
+The minimum multivariate ESS for all parameters considered should be $8831$ according to the formula in~(\ref{eq:mESSbound}).
 }
 \label{tab:continuous_results}
 \begin{center}
@@ -578,7 +579,7 @@ I now move on to explore some more specific questions about phylogenetic space a
 \label{sec:representation}
 
 While multi-dimensional scaling can be useful for visualising phylogenetic space, the issue of which metric to employ remains.
-Since each of the many available metrics capture distinct features, one has to analyse MDS projections under different metrics in order to have a better grasp of the geometry of phylogenetic space.
+Since each of the many available metrics captures distinct features, one has to analyse MDS projections under different metrics in order to have a better grasp of the geometry of phylogenetic space.
 In Figure~\ref{fig:mds_ebov_RF} I show the MDS projection of Robinson-Foulds (RF) distances between MCMC samples for the large Ebola virus data set (\verb|EBOVa|) -- the analysis detailed in Chapter 2, see Figure~\ref{fig:ebovmultimod}. 
 It is clear that run 3 for the \verb|STL| operator (see Chapter 2) is distinct from the others. 
 In addition, one can see that the last samples of run 2 \verb|STL| (larger green points) are closer to the region visited by the default runs and \verb|STL| run 1.
@@ -592,6 +593,7 @@ These results show that the projection using the Robinson-Foulds capture importa
  I sampled 200  equally spaced trees from each chain (1200 trees in total) and computed the Robinson-Foulds distance~\citep{Robinson1981} for every pair of trees.
  Colours relate to the seed used in the pseudo random number generator, ensuring each run starts from the same point. 
  Please see Figure~\ref{fig:ebovmultimod} in Chapter 2 for more details. 
+ The size (radius) of the dots is proportional to the state of the chain.
  }
  \label{fig:mds_ebov_RF}
 \end{figure}
@@ -658,7 +660,7 @@ In this section I offer a first stab at this question by analysing a simulated d
 I present trace plots of the distance to the true tree and MDS projections of the posterior distributions under various metrics, marking the maximum clade credibility (MCC) trees obtained from each run of each operator mix and the true tree used to generate the data.
 In Figure~\ref{fig:mds_50taxa_RF}, I show the MDS projection of the RF distances between trees sampled using three MCMC schemes (``operator mixes'' or MCMC schemes, see Chapter 2), under two generating models: a tree drawn from the coalescent and an empirical tree extracted from a real-world data sets.
 We can see that as the amount of data increases, the posteriors become more concentrated around the true value, as do the MCC trees, as expected.
-While this behaviour is shared for both true trees (coalescent or empirical), the posteriors for the coalescent generating tree seem to be more variable.
+While this behaviour is present for both true trees (coalescent or empirical), the posteriors for the coalescent generating tree seem to be more variable.
 
 \begin{figure}[!ht]
 \begin{center}
@@ -666,6 +668,7 @@ While this behaviour is shared for both true trees (coalescent or empirical), th
 \end{center}
  \caption[MDS projections for the simulated 50 taxa data set (Robinson-Foulds distances).]{\textbf{MDS projections for the simulated 50 taxa data set (Robinson-Foulds distances).}
   I show three replicates per operator, 1000 trees in each replicate, computing the RF distance between all pairs of trees.
+  The cross marks the true tree used to simulate the data.
  Colours pertain to the combination of MCMC transition kernels used and solid diamonds mark the maximum clade credibility (MCC) trees obtained from each run.
  Horizontal panels show the true tree: either drawn from the coalescent or extracted from a real world data set (``empirical'').
  Vertical panels show the number of sites in the simulated alignment (1000, 5000 or 10 000).
@@ -684,6 +687,7 @@ An interesting observation is that the default operators sometimes lead to sampl
 \end{center}
  \caption[MDS projections for the simulated 50 taxa data set (Kendall-Colijn distances).]{\textbf{MDS projections for the simulated 50 taxa data set (Kendall-Colijn distances).}
   I show three replicates per operator, 1000 trees in each replicate, computing the KC distance between all pairs of trees.
+ The cross marks the true tree used to simulate the data.
  Colours pertain to the combination of MCMC transition kernels used and solid diamonds mark the maximum clade credibility (MCC) trees obtained from each run.
  Horizontal panels show the true tree: either drawn from the coalescent or extracted from a real world data set (``empirical'').
  Vertical panels show the number of sites in the simulated alignment (1000, 5000 or 10 000).
@@ -709,7 +713,7 @@ Taken together with Figures~\ref{fig:mds_50taxa_RF} and~\ref{fig:mds_50taxa_KC0}
 \label{fig:mds_50taxa_SP}
 \end{figure}
 
-When we know the true tree, we can also study phylogenetic space and its exploration by MCMC by computing the distance to the true tree and tracking how the distance changes through the chains as well as the resulting distributions.
+When we know the true tree, we can also study phylogenetic space and its exploration \textit{via} MCMC by computing the distance to the true tree and tracking how the distance changes through the chains as well as the resulting distributions.
 In this simulated example we can exploit the fact that we know the true tree to the visualisation/analysis problem to essentially one dimension.
 We can look at the resulting distributions as if they were univariate targets, which in turn facilitates visualisation and intuition-building, in addition to making it possible to apply a plethora of statistical methods developed for the analysis of univariate distributions.
 While in practice we do not know the true tree, these simulations are useful for understanding the behaviour of transition kernels and MCMC in general. 
@@ -717,7 +721,7 @@ While in practice we do not know the true tree, these simulations are useful for
 In Figure~\ref{fig:topo_distances_50taxa} I show the results of this analysis for the 50 taxa simulated example discussed above, for topological metrics (RF and KC)  in order to show the combinatorial (discrete) multimodality of phylogenetic space.
 The first pattern to notice is that the number and location of peaks changes as the amount of information increases (colours).
 Secondly, I highlight how running the chains for longer leads to better defined peaks, even though for this simple example\footnote{Recall that in this example the parameters are inferred under the generating model,\textit{i.e.} there is no model misspecification.} 10 million iterations seem to be adequate to find and explore all of the detected modes.
-Also noticeable is how diffuse the target for the coalescent tree is for small alignment size (one thousand sites) under the KC metric (Figure~\ref{fig:topo_distances_50taxa}, panel D).
+Also noticeable is how diffuse the target for the coalescent tree is for a small alignment size (one thousand sites) under the KC metric (Figure~\ref{fig:topo_distances_50taxa}, panel D).
 While the target intermediate alignment shows bimodality, the target for 10 thousand sites shows three modes, one much bigger than the other two.
 Overall the empirical generating tree leads to more complex posteriors, specially for the intermediate alignment size (panel B, red curve).
 
@@ -734,7 +738,7 @@ Overall the empirical generating tree leads to more complex posteriors, speciall
 \end{figure}
 
 When we turn attention to metrics that incorporate branch length information (Figure~\ref{fig:cont_distances_50taxa}), another interesting pattern emerges: while the SP metric leads to smooth targets, the KC metric shows distinct multimodality for the empirical generating tree.
-It is difficult to say whether these observed differences are due to some underlying fundamental distinction or just an artefact specific to the two trees used -- there were not replicates at generating tree level of the experiment.
+It is difficult to say whether these observed differences are due to some underlying fundamental distinction or just an artefact specific to the two trees used -- there were no replicates at generating tree level of the experiment.
 This result calls for further investigation into the inherent differences between empirical trees,~\textit{i.e.}, trees that are estimated from data encountered in practice, and their coalescent counterparts (see Section~\ref{sec:conclusion}).
 
 \begin{figure}[!ht]
@@ -762,7 +766,7 @@ See Section~\ref{sec:mcmc_efficiency} in Chapter 2 for more details on how this 
 In this chapter I have sought to supplement the toolbox of diagnostic measures for MCMC in phylogenetic space with a few new tools and other tools seldom used in the field.
 I by no means claim to have provided the first workflow of this kind, however.
 Previous studies such as~\cite{Hillis2005},~\cite{Lakner2008},~\cite{Nylander2008} and~\cite{Warren2017} have touched on many of the aspects tackled here.
-The research report here is an attempt at combining previous approaches with new metrics while overcoming some of the technical hurdles that large time-calibrated phylogenies impose.
+The research reported here is an attempt at combining previous approaches with new metrics while overcoming some of the technical hurdles imposed by large time-calibrated phylogenies impose.
 
 The results for the ``poor'' runs (Table~\ref{tab:continuous_results}) are not surprising since the chain was deliberately designed to mix poorly in phylogenetic space.
 A perhaps more subtle point to be made, however, is that since parameters vary regarding their inherent dependence on the phylogeny, computing global convergence metrics including all parameters might mask convergence problems.
@@ -775,14 +779,14 @@ The practical relevance of this rule is yet another topic for future research.
 Regarding diagnostics specifically designed for phylogenies, the results in Table~\ref{tab:tree_results} suggest a lack of agreement between approximate ESSs computed using different tree metrics.
 For instance, for the poorly mixing runs some ESSs computed using the clade difference (CD) and branch score (BS) are estimated as 1001, the maximal value, suggesting these metrics might not be reliable for discriminating between poorly mixing runs and adequately mixing ones.
 These results are in tune with those presented in Section~\ref{sec:representation}, which show that MDS projections under some metrics fail to highlight differences between runs and thus indicate severe convergence problems. 
-In contrast, Figure~\ref{fig:ESS_distance_true} in Chapter 2 shows that pseudo-ESS seem consistent between metrics -- the ranking between MCMC schemes is largely consistent --, at least in a setting where the focal tree is a summary tree from the tail end of three independent (long) golden runs.
+In contrast, Figure~\ref{fig:ESS_distance_true} in Chapter 2 shows that pseudo-ESS seems consistent between metrics -- the ranking between MCMC schemes is largely consistent --, at least in a setting where the focal tree is a summary tree from the tail end of three independent (long) golden runs.
 Clade-based metrics seem to provide more discriminating tools, albeit the experimental setup does not allow definitive claims to be made.
 As discussed in Section~\ref{sec:cladeSwitch}, correlation structure between clades complicates diagnostics based on marginal quantities, what seems to be corroborated by the fact that for the poorly mixing runs the mean univariate ESS for clade indicators was around $800$, which could mislead researchers into inferring acceptable mixing.
 
 These inconsistencies seem to stem from the non-standard nature of phylogenetic space, which admits many representations without any one way of depicting the space being canonical.
 The Billera-Holmes-Vogtman (BHV,~\cite{Billera2001}) cubical complex representation is a good candidate with good statistical properties, but distances are hard to compute, while others such as Kendall-Colijn metric are easier to compute but suffer from poor statistical and/or theoretical properties.
 The KC metric for example suffers from an inherent scaling problem: when branch lengths and node indices are not commensurate, it is hard to calibrate $\lambda$ in order to obtain interpretable results.
-A study in the same vein as~\citep{Kuhner2014} to compare the relative efficiency of tree metrics specifically for time-calibrated phylogenies is sorely needed.
+A study in the same vein as~\cite{Kuhner2014} to compare the relative efficiency of tree metrics specifically for time-calibrated phylogenies is sorely needed.
 
 The attentive reader will have noticed that while I mention and describe the BHV (geodesic) metric and associated space, none of my results include this metric.
 This deserves explanation.
@@ -811,7 +815,7 @@ Several questions remain open however, which I intend to tackle in future resear
  However, non-trivial correlations between clades mean that naive metrics that do not take this correlation into account will fail to spot nonconvergence.
  The ``holy grail'' of  MCMC for phylogenies convergence assessment is to find a cheap, preferably univariate measure that captures convergence with high sensitivity.
  \item Is it possible to elect one particular metric as more appropriate for the analysis of time-calibrated phylogenies?
- As mentioned above, a study extending the results of~\citep{Kuhner2014} to time-calibrated phylogenies would be a good contribution.
+ As mentioned above, a study extending the results of~\cite{Kuhner2014} to time-calibrated phylogenies would be a good contribution.
  Such a study would have to consider how to incorporate the serially sampling structure of tips into the experimental design, seeing as the sampling dates of the tips impose constraints not only on topology but also on branch lengths~\citep{Moller2018}.
 \end{itemize}
 
