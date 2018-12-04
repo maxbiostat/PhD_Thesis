@@ -16,7 +16,7 @@ The GP gene codes for the virus glycoprotein, which is expressed on the surface 
 It is thought to be involved with  for receptor binding and membrane fusion and thus to be crucial for interaction with the host.
 This also means the GP gene is one of most studied genes in the Ebola virus (EBOV) genome~\citep{Li2016}.
 
-The present chapter concerns the study of the impact of a particular mutation on EVD fatality, namely a non-synonymous C-to-T substitution at nucleotide $6,283$ mutation resulting in the wild-type alanine (A) being replaced by a valine (V) at the 82nd aminoacid position which interacts with the cell fusion receptor (NPC1).
+The present chapter concerns the study of the impact of a particular mutation on EVD fatality, namely a non-synonymous C-to-T substitution at nucleotide $6,283$ mutation resulting in the wild-type alanine (A) being replaced by a valine (V) at the 82nd aminoacid position, which interacts with the cell fusion receptor (NPC1).
 This mutation, henceforth referred to as \verb|GP82AV| emerged early in the epidemic in Guinea (see Figure 1 in~\cite{Diehl2016}) and quickly spread through other countries and became dominant whereas the wild type (A) persisted in a few regions.
 In~\cite{Diehl2016}, we analysed a set of clinical data for which there was information on which GP82 genotype the virus isolated from a patient had and also the EVD outcome (died/survived).
 In that study, a positive association between  \verb|GP82AV| and risk of death (odds ratio: $2.09$, 95\% confidence interval [$0.94$, $4.64$]).
@@ -56,17 +56,17 @@ Finally, I employ comparative method techniques to estimate heritability of vira
 
 In this chapter I shall make use of both orthodox (frequentist) and Bayesian methods, which might cause some confusion.
 While I compute both confidence and credibility (or credible) intervals for various quantities, it is important to note that these are fundamentally different objects, in both construction and goal.
-While confidence intervals are built with frequency guarantees in mind (e.g. a properly constructed 95\% confidence interval will contain the true parameter in 95\% of replicate experiments), credibility intervals are constructed to give a 95\% probability that the true parameter is contained in the interval, without reference to replicated experiments/data sets.
+While confidence intervals are built with frequency guarantees in mind (e.g. a properly constructed 95\% confidence interval will contain the true parameter in 95\% of replicate experiments, on average), credibility intervals are constructed to give a 95\% probability that the true parameter is contained in the interval, without reference to replicated experiments/data sets.
 
 \subsection{Data}
 
 From the 1610 full EBOV genomes available, $316$ had information on cycle threshold (\ct) values and $299$ sequences had information on patient outcome (died/survived)\footnote{Please note there are small differences between the data described here and that analysed by~\cite{Diehl2016}.}.
 The cycle threshold is a measure of how many polymerase chain reaction (PCR) cycles are necessary to obtain amplification of a given target sequence, and thus is directly related to the relative abundance of said sequence in the sample and can be used as a proxy for viral load, or the amount of virus DNA in a sample.
-Since the cycle threshold (\ct) is inversely and non-linearly related to the amount of virus DNA in the sample, which in turn is thought to be correlated with viral load, I propose to transform \ct~in order to get the viral load $\text{VL} = -\log \text{C}t$.
+Since the cycle threshold (\ct) is inversely and non-linearly related to the amount of virus DNA in the sample, which in turn is thought to be correlated with viral load, I propose to transform \ct~in order to get the viral load, \verb|viral_load|$= -\log \text{C}t$.
 While this transform ensures the sign of the coefficient in a regression setting is easier to interpret, magnitude is an entirely separate problem.
 Since the main goal in this chapter is to study the effect of \verb|GP82AV| I will not pursue this issue any further.
 There were $233$ sequences with complete information on \ct~and outcome, of which $221$ also had information about location.
-When focusing solely on sequences from Guinea, we are left with $202$ sequences.
+When focussing solely on sequences from Guinea, we are left with $202$ sequences.
 
 In order to aid modelling location-specific heterogeneity in case fatality rates, I collected a number of location-level predictors.
 Specifically, I collected data on how many health centres, clinics and pharmacies there were in each prefecture (level 2 administrative unit).
@@ -77,8 +77,8 @@ This ensures that coefficients for continuous predictors are comparable to those
 
 \subsection{Binary regression}
 \label{sec:binreg}
-
-Generalised linear modelling  with a binary outcome $\boldsymbol Y \in [0, 1]^N$.
+Since the dependent variable is binary, I shall employ generalised linear modelling with a binary outcome $\boldsymbol Y \in [0, 1]^N$.
+The model can be written as 
 \begin{align}
  \label{eq:binglm}
  g(Y_i) &= \boldsymbol X_i^\intercal \boldsymbol\beta + \alpha  + \epsilon_i,\\
@@ -118,7 +118,8 @@ A model where $\gamma_j = 0 \: \forall j$ (and therefore $\delta_j = 0 \: \foral
 
 I fit all generalised multilevel models using the probabilistic programming language Stan~\citep{Carpenter2017}, which allows the use  of Hamiltonian Monte Carlo (HMC,~\cite{Neal2011}) to approximate posterior distributions.
 I run 4 independent chains of 5000 iterations with 2500 iterations discarded as warm-up.
-I assessed convergence by visually inspecting parameter traces, checking that effective sample sizes were above $200$ and the $\hat{R}$ statistic~\citep{Brooks1998} was close to $1.0$.
+I assessed convergence by visually inspecting parameter traces for stationarity and checking the $\hat{R}$ statistic~\citep{Brooks1998} was close to $1.0$..
+To ensure appropriate mixing I also calculated effective sample sizes and checked they were above $200$.
 
 \subsubsection{Prior modelling and effect size}
 \label{sec:priors}
@@ -146,7 +147,7 @@ I argue that we can use these functional forms to elicit informative priors for 
 The first step in constructing sensible priors is to understand the scale and variation of case-fatality rates.
 I constructed a Beta distribution for $p_0$  with parameters $\alpha = 46.063$ and $\beta = 24.511$ using the information presented in page 6 of the meta-analysis by~\cite{Nyakarahuka2016}.
 This information suggests the average CFR is $\mathbb{E}[p_0]= 0.65$, which in turn implies that $\mathbb{E}[R_m] = 1.54$,~\textit{i.e.} the average maximum risk ratio is about 54\%.
-We can use this information to control the upper tail of the distributions for $\beta_{\text{GP82AV}}$.
+We can use this information to control the upper (right) tail of the distributions for $\beta_{\text{GP82AV}}$.
 I propose we consider three scenarios
 \begin{itemize}
  \item \textbf{Conservative:} there is very little chance there is an effect.
@@ -178,7 +179,7 @@ I also consider the so-called g-prior~\citep{Zellner1986}, which scales the cova
 Here I explore a g-prior with $g = N$ and a g-prior with an inverse-Gamma hyperprior on $g$ as discussed in~\cite{Liang2008}\footnote{It should be noted that the impact of the g-prior is minimised in our setting due to the scaling of the predictors. It is included here mostly for completeness.}.
 
 A small caveat of eliciting the priors based on three quantities (mean, lower and upper 95\% quantiles) is that matching all three is sometimes not attainable.
-Whenever this happened I chose to prioritise the mean and upper quantile for the neutral prior while focusing on the mean and lower quantile for the optimistic prior.
+Whenever this happened I chose to prioritise the mean and upper quantile for the neutral prior while focussing on the mean and lower quantile for the optimistic prior.
 Elicitation  of the conservative prior encountered no such problems, mostly due to the small variances involved.
 
 \textbf{Priors for the multi-level model parameters}
@@ -193,7 +194,7 @@ The coefficients ($\boldsymbol\beta$ and $\boldsymbol\delta$) are given independ
 Since viral genetic information is available for the clinical data discussed in this chapter, it is of interest to investigate the association between phylogeny -- of virus -- and the patient's outcome.
 
 For the analyses outlined in this section, I estimated a time-calibrated phylogeny from the $299$ complete genomes using BEAST~\citep{Drummond2012}.
-Data were partitioned in four partitions: coding regions with positions 1, 2 and 3 and intergenic region.
+Data were divided into four partitions: coding regions with positions 1, 2 and 3 and intergenic region.
 I used the HKY model~\citep{Hasegawa1985} model of nucleotide substitution along with Gamma-distributed rate heterogeneity and a log-normal relaxed clock that assumes among-branch variation in rates follows a log-normal distribution.
 
 \subsubsection{Continuous trait analysis}
@@ -217,7 +218,7 @@ One way to partially accommodate this fact is to assume that the phylogeny infer
 This idea underpins most of the comparative method and is the basis of the phylogenetic logistic regression (PLR) approach of~\cite{Ives2009}, which also accommodates binary covariates.
 This is important because the main focus of this chapter is to study the effect of a binary variable, the absence/presence of the GP82AV mutation.
 
-The idea behind PLR is to use the phylogenetic tree, $\tau$ to construct a matrix $\boldsymbol W$ such that $W_{ii}$ is the distance from tip $i$ to the root and $W_{ij}$ is the length of the branch leading to the last common ancestor of $i$ and $j$.
+The idea behind PLR is to use the phylogenetic tree $\tau$ to construct a matrix $\boldsymbol W$ such that $W_{ii}$ is the distance from tip $i$ to the root and $W_{ij}$ is the length of the branch leading to the last common ancestor of $i$ and $j$.
 This matrix is then used to formulate a phylogenetic variance-covariance matrix for $\boldsymbol Y$, $\boldsymbol V(\alpha)$:
 \begin{align}
  \boldsymbol V(\alpha) &= \boldsymbol A^{1/2}  \boldsymbol C(\alpha)  \boldsymbol A^{1/2}, \\
@@ -239,7 +240,7 @@ Assuming $H_0$ holds true, one can use the hypothetical distribution of the data
 Then, based on a pre-specified threshold for the probability $f(D; H_0)$, one can reject -- or fail to reject --  the null hypothesis $H_0$.
 
 These testing procedures are usually calibrated in terms of error probabilities.
-When one rejects $H_0$ when it is in fact true, we say a~\textbf{Type I error}  has been committed.
+If one rejects $H_0$ when it is in fact true, we say a~\textbf{Type I error}  has been committed.
 The \textit{false positive} rate $\alpha$ is the probability that a testing procedure will lead to a Type I error.
 In contrast, when one fails to reject $H_0$ when it is false, one has committed a~\textbf{Type II error}.
 The probability that a given testing procedure leads to a Type II error is denoted $\beta$.
@@ -254,12 +255,12 @@ The key quantities in this framework are the measured effect size $\hat{t}$, the
 From these, one can compute the distribution of the estimate $t_r$  that would be  obtained if the data collection and estimation procedure were to be replicated. 
 With the distribution of the replicated estimates $t_r$ in hand, we are then prepared to compute three quantities~\citep{Gelman2014}:
 \begin{itemize}
- \item The probability $t_r$ exceeds the significance threshold, that is, the \textit{power};
+ \item The probability that $t_r$ exceeds the significance threshold, that is, the \textit{power};
  \item The probability that $t_r$ has a different sign from $t$,~\textit{i.e.} the type S error;
  \item The expected type M error, also called the exaggeration ratio, $a_e = E[|\frac{t_r}{t}|]$ which quantifies how far a replicated estimate would be from the true effect size if an statistically significant result were found. 
 \end{itemize}
 
-This framework lends itself well to the situation considered here, where we have an estimate of the effect of GP82AV on EVD fatality rates and would like to interrogate the study design and obtained estimates with respect to potential errors of both sign (is the mutation a protective or risk factor or none?) and magnitude (how much more/less risk of death from EVD stems from the absence/presence of GP82AV?).
+This framework lends itself well to the situation considered here, where we have an estimate of the effect of GP82AV on EVD fatality rates and would like to interrogate the study design and obtain estimates with respect to potential errors of both sign (is the mutation a protective or risk factor or none?) and magnitude (how much more/less risk of death from EVD stems from the absence/presence of GP82AV?).
 
 An important caveat is that I do not know the true effect size $t$ and the literature is scant in terms of information that could be used to establish a reasonable value for $t$.
 To address this I first use the bound derived in Section~\ref{fig:informativePriors} to restrict attention to effect sizes corresponding to risk ratios of less than $1.54$.
@@ -300,7 +301,7 @@ It would be desirable, however, to adjust these estimates for the effect of the 
 This can be achieved by fitting a logistic generalised linear model with both \verb|viral_load| and \verb|GP82AV| as predictors (see Section~\ref{sec:binreg}), which yields estimates of $\beta_{\text{GP82AV}} =  0.75$ $(0.02,1.49)$ with standard error $0.37$, corresponding to an odds ratio of $2.13$ $(1.02, 4.44)$\footnote{Estimates for the data from Guinea were very similar at OR = $2.35$ $(1.10, 5.09)$.}.
 I use these corrected estimates to perform the error analyses in the next section.
 
-From these figures, it would appear that the absence/presence of \verb|GP82AV| is positively associated with fatality, that is, \textbf{being infected with a strain of EBOV carrying the V variant increases the risk of dying from EVD}. 
+From these figures, it would appear that the presence of \verb|GP82AV| is positively associated with fatality, that is, \textbf{being infected with a strain of EBOV carrying the V variant increases the risk of dying from EVD}. 
 In the remainder of this chapter I interrogate this claim and attempt to account for multiple sources of uncertainty and confounding.
 
 \subsection{Experiment 0: type M and S errors for the effect of  GP82AV}
@@ -370,7 +371,7 @@ Nevertheless this PSA is useful in establishing a baseline against which all sub
   \centering
   \includegraphics[scale=0.8]{\dir/figs/simple_logistic_PSA.pdf}
 \caption[Prior sensitivity analysis for a simple logistic regression.]{\textbf{Prior sensitivity analysis for a simple logistic regression.}
-In total I considered seven ``default'' priors routinely discussed in the literature (see Section~\ref{sec:priors} for details).
+In total I considered seven ``default'' priors routinely employed in the literature (see Section~\ref{sec:priors} for details).
 Panel A shows the posterior distribution for the baseline CFR (a transformation of the intercept $\alpha$), while panel B shows the posterior distribution for the quantity of greater interest, the effect (coefficient) of GP82AV.
 I show the resulting distribution on the odds ratio in panel C and the distribution of the coefficient for viral\_load in panel D.
 The vertical dashed line shows the ordinary least squares parameter estimates and the dotted line indicates the null values $\beta_{\text{GP82AV}} = 0$ and $\text{OR} = 1$ for ease of comparison.
@@ -414,7 +415,7 @@ This is apparent from Figure~\ref{fig:informativePriors} and is reflected in the
 \subsection*{Experiment 3: mutilevel modelling}
 \label{sec:results-multilevel}
 
-When considering the effect of the mutation on fatality rates the cautious analyst would like to consider alternative explanations connected with the host population rather than the virus.
+When considering the effect of the mutation on fatality rates, the cautious analyst would like to consider alternative explanations connected with the host population rather than the virus.
 In other words, there might be confounding factors such as differential access to health care across locations, which could be driving the observed association between \verb|GP82AV| and risk of death.
 I attempt to account for these factors by  formulating a model that explicitly accounts for variation in case fatality rates across locations through the model outlined in Equations~\ref{eq:varyingintA}~to~\ref{eq:varyingintB}.
 The analyses in this section pertain to the data from Guinea only, since I could only reliably collect information on population-level predictors for that country.
@@ -481,11 +482,11 @@ The short answer is: probably not.
 
 The first issue to consider is that of \textbf{uncertainty}. 
 In order to make claims about the effect of the \verb|GP82AV| mutation one needs first to quantify the uncertainty about the effect size.
-As the analyses in Section~\ref{sec:MSerror} show, for a low true effect size (risk ratios $<1.10$, the standard error estimated with the current design/data could lead to gross overestimation of the effect. 
+As the analyses in Section~\ref{sec:MSerror} show, for a low true effect size (risk ratios $<1.10$), the standard error estimated with the current design/data could lead to gross overestimation of the effect. 
 It must also be said that these analyses suggest that a sign error, that is an error that would lead to inferring \verb|GP82AV| to be a protective factor, is very unlikely.
 If the mutation has any bearing on the outcome of EVD at all, it most likely increases the risk of dying.
 
-When I consider the uncertainty about the baseline case-fatality rate ($p_0$), panel A in Figure~\ref{fig:ORRRuncertainty} shows the uncertainty about the maximum effect of the V mutation compared to the wild-type.
+With regard to the uncertainty about the baseline case-fatality rate ($p_0$), panel A in Figure~\ref{fig:ORRRuncertainty} shows the uncertainty about the maximum effect of the V mutation compared to the wild-type.
 From this it is clear that it is very unlikely that being infected with a virus carrying the V mutation increases the probability of dying by more than $60$\%.
 Panel B shows that the original estimate for $\beta_{\text{GP82AV}}$ lies in a region of large uncertainty w.r.t. risk ratios.
 This means that, considering the variation (uncertainty) of the CFR, any estimate of the risk ratio corresponding  to the region of the observed log-odds ratio (taken at face value) could be between $1.15$ and $1.35$ with probability 95\%.
@@ -546,7 +547,7 @@ In this chapter I lay out a principled analysis of the effects of a viral mutati
 I tackle the issue from multiple angles and, crucially, consider several sources of uncertainty.
 When many sources of uncertainty about the effect of the \verb|GP82AV| mutation are considered, it is clear that strong claims are not warranted.
 I also show that accounting for dependence between observations through the phylogeny leads to a substantial increase in uncertainty about the effect.
-Phylogenetic methods proved crucial to account for the dependence in the data and provide correct answers.
-The main lesson here is that all scientific statements, in order to be valid and useful, must be coupled with a proper account of the associated uncertainty and model assumptions.
+% Phylogenetic methods proved crucial to account for the dependence in the data and provide correct answers.
+% The main lesson here is that all scientific statements, in order to be valid and useful, must be coupled with a proper account of the associated uncertainty and model assumptions.
 
 % \bibliography{/home/max/Dropbox/PHD/THESIS/bibliography/lmcarvalho_PhD_Thesis}

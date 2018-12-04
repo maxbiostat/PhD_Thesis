@@ -16,7 +16,7 @@ These figures make the 2013-2016 EVD epidemic in West Africa the worst in histor
 Ebola virus (EBOV) was first detected in what is now the Democratic Republic of Congo (DRC), in 1976.
 Until the 2013-2016 epidemic, EBOV had been restricted to  Middle Africa (Uganda, Sudan, DRC and Gabon)~\citep{CDC2015}.
 Thus one of the main scientific questions emerging from the West African EVD epidemic was what factors led to such a high number of cases and geographic extent.
-Whilst many approaches are possible to tackle this question, in this chapter we will look at how virus genomes can be used to shed light into the ecological and epidemiological processes connected with the epidemic.
+Whilst many approaches are possible in tackling this question, in this chapter we will look at how virus genomes can be used to shed light into the ecological and epidemiological processes connected with the epidemic.
 
 As the epidemic unfolded, various research groups started generating EBOV genomic sequences from clinical samples using high-throughput next-generation sequencing (NGS).
 In total, more than 1600 complete EBOV genomes were generated, resulting in a -- temporally and spatially --  dense sampling of over 5\% of known cases.
@@ -26,7 +26,7 @@ Examples of such insights are the probable date of origin of the circulating str
 See~\cite{Holmes2016} for a comprehensive review of the studies generating EBOV genome sequences and the technologies employed.
 
 While phylogenetic methods helped describe some aspects of the epidemic and EBOV evolution, the driving factors behind the epidemic in West Africa are largely unknown.
-To address this \cite{Dudas2017} employed a sophisticated generalised linear model (GLM) framework to uncover the socio-economic, climatic and geographic factors driving EBOV spread in West Africa.
+To address this, \cite{Dudas2017} employed a sophisticated generalised linear model (GLM) framework to uncover the socio-economic, climatic and geographic factors driving EBOV spread in West Africa.
 Specifically,~\cite{Dudas2017} put forth a phylogeographic model in which the transition (migration) rates between locations are modelled as linear combinations of a large set of predictors~\citep{Lemey2014}.
 Examples of such predictors are the distance between locations, differences in population sizes, languages spoken, presence/absence of borders and climatic factors such as temperature and precipitation.
 This modelling strategy combines phylogenetic and as well as epidemiological information in a principled manner and allowed the authors to ascertain the relative importance of each predictor and thus uncover the driving factors behind EBOV spread.
@@ -73,7 +73,7 @@ I note, however, that other approaches to variable selection are possible, see e
 This model can be very efficiently fitted to data using Markov chain Monte Carlo (MCMC), as I will detail in section~\ref{sec:mcmc_ch4}.
 % \subsubsection*{Priors}
 
-The issue of shrinkage in regression,\textit{i.e.} the reduction in the effects of sampling variation by obtaining a parsimonious representation of the data, is a long-standing one.
+The issue of shrinkage in regression,~\textit{i.e.} the reduction in the effects of sampling variation by obtaining a parsimonious representation of the data, is a long-standing one.
 Many prior formulations are possible when the goal is to perform variable selection (see~\cite{Malsiner2016} for a review).
 The so-called spike-and-slab priors attempt to allow for shrinkage by either using an absolutely continuous distribution with a mode at zero or distributions with a point-mass at zero, called Dirac spikes.
 Here I will concentrate on constructions with Dirac spikes for $\boldsymbol\beta$.
@@ -98,7 +98,7 @@ A central component to BSSVS is the prior $\pi(\boldsymbol\delta)$.
 A natural choice of prior for $\boldsymbol\delta$ is $\text{Pr}(\delta_j = 1) = p_j$, i.e., a Bernoulli prior on the indicator variables.
 This induces a binomial prior on $S = \sum_{k=1}^P \delta_k$.
 We can take advantage of this to construct priors for $\boldsymbol\delta$ that control how many predictors are included in the model, effectively controlling how parsimonious we want to be \textit{a priori}.
-Let $p_j = q, \: j = 1, 2, \ldots, P$ and $w$ be the probability of no predictors being included, that is,  $\text{Pr}(S = 0)$.
+Let $p_j = q, \: j = 1, 2, \ldots, P$ and $w$ be the probability of no predictors being included, that is,  $w := \text{Pr}(S = 0)$.
 I shall refer to $w$ as the \textit{stringency} of the prior on $S$.
 Then, it is straightforward to see that $w = (1-q)^P$ and hence $q = 1 - w^{1/P}$.
 Here I will use $w = 1/2$.
@@ -150,7 +150,7 @@ One way of accommodating overdispersion is the so-called ``observation-level ran
 \end{align}
 leading to a non-standard distribution for $\boldsymbol Y$ that has $E[\boldsymbol Y] =  \exp(\sigma^2/2)\lambda$ and $Var(\boldsymbol Y) = [\exp(2\sigma^2) - \exp(\sigma^2)] \lambda^2 + \exp(\sigma^2/2)\lambda$.
 % , where $\mu = \boldsymbol X^\intercal \boldsymbol\beta$
-When $\sigma^2 = 0 $, we recover the model in~\ref{eq:poissonglm}\footnote{I am keeping $\lambda$ consistent across parametrisations for ease of comparison.}.
+When $\sigma^2 = 0 $, we recover the model\footnote{I am keeping $\lambda$ consistent across parametrisations for ease of comparison.} in equation~(\ref{eq:poissonglm}).
 
 An alternative approach to modelling overdispersion is to assume the data come from a negative binomial distribution:
 \begin{align}
@@ -182,11 +182,11 @@ leading to the joint distribution
 \end{equation}
 where $\boldsymbol W$ is a spatial weight matrix, usually $W_{ij} = 1$ if $i$ and $j$ are spatial neighbours and $W_{ij} = 0$ otherwise, with $W_{ii} = 0$.
 A diagonal matrix $\boldsymbol D$ where $D_{ii} = \sum_{j = 1}^N W_{ij}$, a vector of means $\boldsymbol\mu$, a correlation parameter $\phi$ and a scale parameter $\tau$ complete the model specification.
-A common simplification is to assume the spatial process has mean zero, i.e, $u_i = 0 \:\forall i$, since one is interested in describing the mean of the process using the covariates $\boldsymbol X$.
+A common simplification is to assume the spatial process has mean zero, i.e, $u_i = 0,\:\forall i$, since one is interested in describing the mean of the process using the covariates $\boldsymbol X$.
 Here I consider only the so-called proper models, i.e., models for which  $|\phi| < 1$.
 Data are usually not very informative with respect to $\phi$ and $\tau^2$, so it is customary to fix these parameters and then perform a sensitivity analysis to their fixed values.
 I have implemented both the fully Bayesian version and the fixed parameter version, this latter having the advantage of much faster computation times.
-For prior recommendations on the parameters of the models discussed in this section, I refer the viewer to~\cite{Gelman2006} for priors on the variance components and to~\cite[sec. 5.4.3]{Banerjee2003} for CAR model parameters.
+For prior recommendations on the parameters of the models discussed in this section, I refer the viewer to~\cite{Gelman2006} for priors on the variance components and to~\cite{Banerjee2003} (sec. 5.4.3) for CAR model parameters.
 
 
 Finally, I remark that it is usual when modelling disease data to write the mean as a product of an exposure variable $E_i$ and a relative risk, i.e., $\lambda_i = E_i e^{\psi_i}$.
@@ -197,7 +197,7 @@ An example of exposure variable would be the population in a certain area.
 
 The (joint) posterior distribution for the parameters in~\ref{eq:eglm},
 \[ p(\boldsymbol\theta| \boldsymbol X, \boldsymbol Y ) \propto f(\boldsymbol Y | \boldsymbol X, \boldsymbol\theta)\pi(\boldsymbol\theta), \]
-where $\boldsymbol\theta = \{ \delta, \alpha, \sigma^2, \tau^2, ...\}$ stands for all parameters of interest, is not available analytically, but fortunately can be efficiently approximated using Markov chain Monte Carlo.
+where $\boldsymbol\theta = \{ \boldsymbol\beta, \boldsymbol\delta, \alpha, \sigma^2, \tau^2, ...\}$ stands for all parameters of interest, is not available analytically, but fortunately can be efficiently approximated using Markov chain Monte Carlo.
 I implemented all models discussed in this chapter using the language JAGS~\citep{Plummer2003}.
 % While very efficient Gibbs sampling schemes have been devised for the models considered here, I will instead take advantage of the Metropolis-Hastings machinery available in BEAST to sample the joint posterior of the parameters.
 % To propose a new state $\boldsymbol\beta^\prime$, I will follow~\cite{Lemey2014} and draw $\boldsymbol\beta^\prime \sim \text{MVN}(\boldsymbol\beta, v \left( \boldsymbol X^\intercal \boldsymbol X\right)^{-1} )$, where $v$ is an adaptive parameter that can be used to tune the proposal so as to achieve a desired acceptance probability.
@@ -325,7 +325,7 @@ Genetic & NumSeq & number of EBOV complete genome sequences collected & no\\
 
 A second outcome of interest is the persistence of EBOV and its determinants.
 Combining genetic data and a phylogeographic model,~\cite{Dudas2017} computed the numbers of viral introductions from and to each location (where sequences were sampled) and then estimated the persistence times (in days) for each location.
-Following the authors I define a cluster as a group of sequenced cases in a region that can be traced to a single introduction and then define persistence as the time from the MRCA and the last sampled sequence in the cluster.
+As in~\cite{Dudas2017}, I define a cluster as a group of sequenced cases in a region that can be traced to a single introduction and then define persistence as the time from the MRCA and the last sampled sequence in the cluster.
 For this data set, $N = 56$ data points were available, corresponding to the $56$ (admin 2 level) locations represented in the data analysed by~\cite{Dudas2017}. 
 
 As with the analysis of case counts, my main goal is to ascertain which of the available predictors is strongly associated with viral persistence in a given region.
@@ -488,7 +488,7 @@ TT100K & -0.59 & -1.11, 0.64 & 0.17 & 4.2\\
 I extend the analyses in~\cite{Dudas2017} by considering a much larger set of predictors ($P = 57$, description in Table~\ref{tab:predictorTable}), taking advantage of the SSVS framework.
 Results in Table~\ref{tab:case_bigP_results} are wholly consistent with the previous results, with most of the selected covariates being environmental variables related to precipitation, humidity and temperature.
 An important exception is the inclusion of the variable \verb|Lang4| which measures the percent of speakers of a language spoken mostly in the north west of Guinea\footnote{Unfortunately the data coding prevents me from knowing the exact language corresponding to  Lang4.}, a region with a relatively low number of observed cases.
-This is a variable that was not considered by~\cite{Dudas2017} and its inclusion with high probability indicates that cultural factors might shape local transmissibility conditions (see~\cite{Alexander2015} and references therein).
+This variable was not considered by~\cite{Dudas2017} and its inclusion with high probability indicates that cultural factors might shape local transmissibility conditions (see~\cite{Alexander2015} and references therein).
 An alternative view is that the languages spoken in a region are a proxy for the spatial coherence of these regions, but this hypothesis does not explain why the language predictor would still be well supported after accounting for spatial dependence.
 Further investigation is needed before more elaborate hypotheses can be formulated.
 
@@ -602,7 +602,7 @@ Sequence count & 0.20 & 0.07, 0.31 & 0.06 & 5.2\\
 
 \subsection*{Why did the epidemic not spread further?}
 
-Whether a epidemic develops in a region depends on multiple factors, mainly (i) whether the virus is introduced with high frequency and (ii) the local conditions are favourable for maintenance of sustained transmission chains.
+Whether an epidemic develops in a region depends on multiple factors, mainly (i) whether the virus is introduced with high frequency and (ii) the local conditions are favourable for maintenance of sustained transmission chains.
 While this chapter is mainly concerned with (ii), a complete picture of the epidemic can only be painted by also including (i).
 While I tried to address (i) by including the variables \verb|VirIntroAdmin| and \verb|VirIntroDist|, I now focus on (ii) with the hope of gaining insight into why some regions did not experience EVD cases.
 
@@ -610,8 +610,8 @@ Figure~\ref{fig:mapsCases} shows the observed and predicted numbers of EVD cases
 This is important because even though the absolute number of cases is an important epidemiological variable, incidence rates provide a relative (scaled) measure of the disease burden in a given region.
 Using a Poisson model with OLRE and SSVS (model 7, Table~\ref{tab:case_glm_results}), I predict that Cavally and Tonkpi (in the Ivory Coast) for instance would have experienced $470$ (1, 2547) and $1225$ (0, 8854) cases, respectively.
 Despite these numbers being reasonably high compared to the overall average of 387 (95\% credible interval: 2, 2206), they would mean incidences of 111 and 129 cases per 100, 000 inhabitants, which are not substantially high compared to the average of 97 (2, 408) cases/100K.
-These are predictions the epidemic potential, however, as these regions did not report any cases.
-This suggests that while local conditions were conducive to the development of epidemics, the number of introductions into these locations, among other factors, was not enough to lead to successful establishment of transmission chains. 
+These are predictions of the epidemic potential, however, as these regions did not report any cases.
+This suggests that while local conditions were conducive to the development of epidemics, the number of introductions into these locations was not enough to lead to successful establishment of transmission chains. 
 
 \begin{figure}[htbp]
   \centering
@@ -660,7 +660,7 @@ Hence, in summary:
 
 I now focus on the technical aspects of the modelling effort presented in this chapter.
 I would like to point out that while I lay out a complete framework for modelling epidemiological data in this chapter, I make no claims of originality.
-See the frameworks proposed by e.g.~\cite{Scheel2013} and~\cite{Boehm2015}, which touch on the same ideas explored in this chapter: generalised linear models, spatial structures and variable selection.
+See the frameworks proposed by e.g.~\cite{Scheel2013} and~\cite{Boehm2015}, who touch on the same ideas explored in this chapter: generalised linear models, spatial structures and variable selection.
 
 A first question one might ask is whether including an explicit spatial component improves model fit and (predictive) performance.
 To assess the amount of variation that is structured spatially, one can compute $\gamma = \text{sd}(\boldsymbol\eta)/\left(\text{sd}(\boldsymbol\eta)  +  \text{sd}(\boldsymbol\epsilon)\right)$.
@@ -719,6 +719,28 @@ The statistical findings can be summarised as:
  \item There is very low residual spatial autocorrelation in the data, leading to unstructured models (OLRE) providing better fit;
  \item Current state-of-the-art recommended priors for the BYM model lead to a miscalibrated induced distribution on the data $\boldsymbol Y$.
 \end{itemize}
+
+\section{Limitations}
+
+In this section I will briefly discuss what I find to be the main limitations of the work presented in this chapter.
+As already pointed out above, BSSVS has an important limitation in the form of combinatorial multimodality.
+From a modelling perspective, this makes it difficult to pin down which factors (covariates) are associated with the outcome and obtain reliable estimates of Bayes factors and coefficients.
+From a computational perspective, multicolinearity-induced multimodality makes the problem intractable and leads to poor exploration of the parameter space by MCMC.
+As such, the results presented here need to be taken with caution because it is not possible to guarantee that the posterior distribution has been adequately sampled, even if the usual diagnostics failed to detect problems.
+Additionally, even in the absence of BSSVS (``full'' models discussed above), the usual CAR formulation is difficult to sample from in its own right.
+
+Another concern that could be raised it that none of the model comparison metrics employed here seem appropriate to discriminate between models in the present context.
+Tables~\ref{tab:case_bigP_results} and~\ref{tab:persistence_bigP_results} suggest that the full models, with $57 (58)$ predictors, are the best fitting models.
+But while one would expect the overall fit to be indeed better for these models, it is expected that the measures such as DIC or WAIC \textit{penalise} bigger models for an execessive number of parameters.
+Since these big models are on the verge of non-identifiability, I would argue the results need to be taken with caution.
+
+Finally, I offer a list of improvements that could be made to the current analysis:
+\begin{itemize}
+ \item Employ a better, more intuitive parametrisation with better prior calibration, as discussed in~\cite{Riebler2016};
+ \item Explore a sparse formulation of the CAR model to facilitate computation as done in~\cite{Morris2017};
+ \item Use a continuous covariate (feature) selection procedure along the the lines of~\cite{Piironen2017} 
+\end{itemize}
+I believe these improvements would lead to more stable computation and a better calibrated model which could in turn lead to better epidemiological inferences.
 
 
 \section{Conclusions and perspectives}

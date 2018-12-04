@@ -25,7 +25,7 @@ Another instance of phylogenetic models being used to inform epidemiological inf
 
 Figure~\ref{fig:phylodyn}~\citep{Suchard2018} showcases the epidemiological analysis of 1610 Ebola virus (EBOV) complete genomes originally carried out by~\citep{Dudas2017}.
 Using a generalised linear model (GLM) framework in conjunction with a phylogeny estimated from the genetic data, it is possible to reconstruct the spatial dynamics of EBOV as well as to study the association of several epidemiological predictors with viral spatial spread (bottom left panel).
-Estimating a time-calibrated phylogeny (see below) also allows one to reconstruct the past population dynamics of the virus through time. 
+Estimating a time-calibrated phylogeny (see below) also allows one to reconstruct the past population dynamics of the virus. 
 
 \begin{figure}[!ht]
 \begin{center}
@@ -39,12 +39,12 @@ Estimating a time-calibrated phylogeny (see below) also allows one to reconstruc
  \label{fig:phylodyn}
 \end{figure}
 
-The chief goal of~\textbf{dating methods} is to combine information contained in the genetic divergence between isolates with some source of external timing information to reconstruct time-calibrated phylogenies and, in turn, infer node ages (divergence times) and evolutionary rates.
+The chief goal of~\textbf{dating methods} is to combine information contained in the genetic divergence between isolates with some source of external timing information in order to reconstruct time-calibrated phylogenies and, in turn, infer node ages (divergence times) and evolutionary rates.
 Common sources of calibration information are the sampling dates in serially-sampled data sets and bounds/distributions for specific divergence events (e.g. the divergence between humans and chimpanzees), commonly used in studies where fossil information is available~\citep{Ho2009}.
-A central object in phylodynamic investigations is the~\textbf{time-calibrated phylogeny}, a rooted phylogenetic tree in which the branch lengths are measured in units of calendar time (see below for a mathematical description).%TODO: ~\ref{sec:}
+A central object in phylodynamic investigations is the~\textbf{time-calibrated phylogeny}, a rooted phylogenetic tree in which the branch lengths are measured in units of calendar time (see Section~\ref{sec:tree_space} below for a mathematical description).
 These objects are specially useful because they allow one to estimate the timing of epidemiologically relevant events and gain insight into the~\textit{tempo} of epidemics.
 
-All dating methods rely on the assumption of a ``molecular clock'', that is, the assumption that mutations accumulate steadily at a particular rate through time~\citep{Welch2005}\footnote{Note that the molecular clock is not a metronome; mutations occur randomly rather at deterministic intervals.}.
+All dating methods rely on the assumption of a ``molecular clock'', that is, the assumption that mutations accumulate steadily at a particular rate through time~\citep{Welch2005}\footnote{Note that the molecular clock is not a metronome; mutations occur randomly rather than at deterministic intervals.}.
 In their seminal work,~\cite{Zuckerkandl1962} dated the origins of different globins by assuming a uniform -- through time -- rate of molecular evolution among species and duplicated genes.
 This basic assumption implies that one can measure the time $t$ of divergence between any two taxa as a function of the number of differences $d$ between their sequences, using a rate $\mu$ to convert between the scales of expected mutations and time.
 There are a plethora of dating methods, ranging from maximum likelihood (ML)~\citep{Rambaut2000,Volz2017,Sagulenko2018} to Bayesian approaches~\citep{Drummond2006} -- see Table 1 in~\cite{Welch2005} and~\cite{Ho2014} for surveys.
@@ -75,22 +75,22 @@ In this thesis I shall concentrate on the uncorrelated ``relaxed'' clocks of~\ci
 Consider a rooted tree with $n$ taxa. 
 This tree will have $N = 2n-3$ branches excluding the root, for which we will not estimate the rate.
 \cite{Drummond2006} assume each branch evolves according to its own rate $r_i \in \mathbf{r} =\{r_1, r_2, \ldots, r_{N}\}$ and that the $r_i$ are i.i.d. random variables.
-The first model to consider is the \textbf{uncorrelated exponential (UCED)} rates model, where:
-\[r_i \sim \text{exponential}(\lambda)\]
+The first model to consider is the \textbf{uncorrelated exponential (UCED)} rates model, where
+\[r_i \sim \text{exponential}(\lambda).\]
 Let $f_{\mathbf{r}}(\cdot)$ the prior density of the rates.
 Then
 \begin{align}
- f_{\mathbf{r}}(\mathbf{r}) &= \prod_{i=1}^{N}\lambda e^{-\lambda r_i} \\
- &= \lambda^{N} e^{-\lambda S}
+ f_{\mathbf{r}}(\mathbf{r}) &= \prod_{i=1}^{N}\lambda e^{-\lambda r_i}, \\
+ &= \lambda^{N} e^{-\lambda S},
 \end{align}
 from which one can note that the prior density depends on the rates $\mathbf{r}$ only through their sum $S = \sum_{i=1}^{N} r_i$, which makes clear the potential for identifiability problems.
 See~\cite{Rannala2002} for more on the identifiability of phylogenetic models.
 
 Next, consider a more flexible model, where the rates are drawn from a \textbf{log-normal distribution (UCLN)}:
-\[r_i \sim \text{log-normal}(\mu, \sigma^2)\]
+\[r_i \sim \text{log-normal}(\mu, \sigma^2),\]
 \begin{align}
- f_{\mathbf{r}}^{\prime}(\mathbf{r}) &= \prod_{i=1}^{N} \frac{1}{r_i\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(\ln r_i- \mu)^2}{2\sigma^2} \right) \\
- &= \frac{1}{P \cdot (2\pi)^{N/2} \cdot \sigma^{N}} \exp\left(-\frac{1}{2\sigma^2}\sum_{i=1}^{N}(\ln r_i- \mu)^2 \right)
+ f_{\mathbf{r}}^{\prime}(\mathbf{r}) &= \prod_{i=1}^{N} \frac{1}{r_i\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(\ln r_i- \mu)^2}{2\sigma^2} \right), \\
+ &= \frac{1}{P \cdot (2\pi)^{N/2} \cdot \sigma^{N}} \exp\left(-\frac{1}{2\sigma^2}\sum_{i=1}^{N}(\ln r_i- \mu)^2 \right),
  \end{align}
 where $P = \prod_{i=1}^{N} r_i$, which appears identifiable at first glance.
 
@@ -118,8 +118,8 @@ The growing mass of available data calls for the development of more realistic e
 Moreover, recent efforts have also advocated for the real-time analysis of sequence data as way of obtaining early insight into epidemic dynamics and inform intervention~\citep{Quick2016,Dudas2017,Hadfield2017}.
 The combination of rapid increase in data and the necessity of timely analyses leads to an increased demand for more efficient estimation methods.
 
-A key assumption for many phylodynamic methods is that the phylogeny is a good~\textit{proxy} for the~\textbf{dependence structure} of the data, even it is rarely framed in this way.
-A good example of this is statistical interplay is given in~\cite{Pybus2012}, where the authors use time-calibrated phylogenies together with the sequences sampling locations and  to obtain estimates of spatial epidemiological parameters such as the velocity of the epidemic wave front and the (spatial) diffusion coefficient for the West Nile virus (WNV) epidemic in the United States of America.
+A key assumption for many phylodynamic methods is that the phylogeny is a good~\textit{proxy} for the~\textbf{dependence structure} of the data, even if it is rarely framed in this way.
+A good example of this statistical interplay is given in~\cite{Pybus2012}, where the authors use time-calibrated phylogenies together with the sequences sampling locations and  to obtain estimates of spatial epidemiological parameters such as the velocity of the epidemic wave front and the (spatial) diffusion coefficient for the West Nile virus (WNV) epidemic in the United States of America.
 \cite{Pybus2012} employ the phylogeny estimated from full WNV genomes as a proxy for the latent (unobserved) spatial dependence between cases and then proceed to~\textbf{condition} on the phylogeny in order to infer the epidemiological parameters.
 Similarly, methods such as the continuous-time Markov chain (CTMC) phylogeography approach of~\cite{Lemey2009} rely on the estimated phylogeny -- and traits observed at the tips/leaves -- to estimate migration (transition) rates between locations.
 This is a key concept in phylodynamics: even if the phylogeny is but a nuisance parameter, one needs to ensure it is estimated correctly -- and uncertainty properly accounted for -- so that inferences made conditional on the underlying dependence structure are correct.
@@ -163,7 +163,7 @@ Under the Bayesian approach, one aims to use~\textit{Bayes' rule} to construct t
 \[ p(\boldsymbol\theta | \boldsymbol y) = \frac{f(\boldsymbol y| \boldsymbol\theta) \pi(\boldsymbol\theta)}{\int_{\boldsymbol\Theta}f(\boldsymbol y| \boldsymbol\theta) \pi(\boldsymbol\theta)d\boldsymbol\theta } ,\]
 often written as $p(\boldsymbol\theta | \boldsymbol y) \propto f(\boldsymbol y | \boldsymbol\theta)\pi(\boldsymbol\theta)$.
 This construction of the inference problem necessitates a probability measure over the parameter space, \textit{i.e.}, a \textbf{prior}, $\pi(\boldsymbol\theta)$.
-In scientific applications, a common interpretation of this approach is that $\pi(\boldsymbol\theta)$ encodes our knowledge about the parameters $\boldsymbol\theta$~\textit{before} we observe the data $\boldsymbol y$ and $p(\boldsymbol\theta | \boldsymbol y)$ represents our updated beliefs/knowledge.
+In scientific applications, a common interpretation is that $\pi(\boldsymbol\theta)$ encodes our knowledge about the parameters $\boldsymbol\theta$~\textit{before} we observe the data $\boldsymbol y$ and $p(\boldsymbol\theta | \boldsymbol y)$ represents our updated beliefs/knowledge.
 
 Two points are worth emphasising: firstly, in contrast to~\textit{maximum likelihood} and other approaches, Bayesian inference focuses on~\textit{integrating} over the likely values of the quantities of interest rather than~\textit{maximising}, that is, finding the value $\hat{\boldsymbol\theta}$ that maximises the likelihood.
 Secondly, all inferences are based on the posterior; point estimates can be derived as expectations\footnote{Mathematically, expectations are integrals.} and any functionals of interest can be studied by transforming $p(\boldsymbol\theta | \boldsymbol y)$. 
@@ -188,10 +188,10 @@ The likelihood is usually based on continuous-time Markov chain (CTMC) models of
 The joint prior $\pi(T, \theta)$ can be constructed in several ways, discussed in more detail below (Section~\ref{sec:coalescent_priors}).
 This joint posterior can then be used to test evolutionary hypotheses, draw inference about population dynamics and obtain estimates of quantities of direct interest, such as the rate of substitution.
 In many applications we are mainly interested in $\theta$, with $T$ being a nuisance parameter.
-The main methodological then problem is accommodating phylogenetic uncertainty -- \textit{i.e} uncertainty about the true underlying ancestry that generated the data -- by~\textit{marginalising} over the distribution of phylogenies to obtain a distribution $p(\theta | D)$.
+The main methodological  problem then is accommodating phylogenetic uncertainty -- \textit{i.e} uncertainty about the true underlying ancestry that generated the data -- by~\textit{marginalising} over the distribution of phylogenies to obtain a distribution $p(\theta | D)$.
 I shall return to the point of efficient marginalisation in Section~\ref{sec:mcmc}.
 
-In addition to providing a principled framework for accommodating uncertainty, Bayesian phylogenetics also allows for the estimation directly interpretable  quantities, such as the posterior probability for a given clade, which are useful in assessing evolutionary hypotheses.
+In addition to providing a principled framework for accommodating uncertainty, Bayesian phylogenetics also allows for the estimation of directly interpretable  quantities, such as the posterior probability for a given clade, which are useful in assessing evolutionary hypotheses.
 As mentioned above, the focus on marginalisation naturally leads to measures of uncertainty.
 While authors such as~\cite{Huelsenbeck2002} have stated that Bayesian methods are also more computationally efficient\footnote{Insofar as the most popular method to approximate posterior distributions, Markov chain Monte Carlo, allows for simultaneous estimation of all quantities of interest.}, I argue that the main advantage of the Bayesian approach -- and perhaps its greatest weakness -- is the ability of the researcher to incorporate substantive expert knowledge into the analysis~\textit{via} careful construction of the prior(s).
 
@@ -208,7 +208,7 @@ See, for instance,~\cite{Yang1996} (and Figure 2 therein) for a discussion on th
 
 In order to understand the challenges of Bayesian phylogenetics it would be desirable to to have a more rigorous description of the parameter space of interest, that is, the space of time-calibrated phylogenies (TCP).
 In this section I introduce the necessary technical background for a rigorous characterisation of phylogenetic space.
-The presentation will follow~\cite{Semple2003} for the general theory and~\cite{Drummond2002} and~\cite{Gavryushkina2013} and for time-trees, with minor adjustments.
+The presentation will follow~\cite{Semple2003} for the general theory and~\cite{Drummond2002} and~\cite{Gavryushkina2013} for time-trees, with minor adjustments.
 In this thesis, I am concerned with time-calibrated phylogenies which are binary (bifurcating)\footnote{While time-calibrated phylogenies need not be fully resolved (bifurcating), I shall make this simplifying assumption throughout the thesis.}, rooted, fully-ranked labelled phylogenies.
 
 A rooted binary tree $t \in \mathbb{T}$ on $n$ taxa is a graph $G(\boldsymbol V_t, \boldsymbol E_t)$ with $2n-2$ edges, $n-1$ internal nodes and $n$ leaf/external nodes, also called taxa -- making up a total of $2n-1$ nodes.
@@ -220,7 +220,7 @@ The set $\boldsymbol C_t = \boldsymbol V_t \setminus \boldsymbol I_t$ is the set
 
 Let $X$ be a non-empty set of labels, $\phi : X \to \boldsymbol V_t$ be a bijective map and $h : \boldsymbol I_t \to \{1, 2, \ldots, |\boldsymbol I_t|\}$ an (injective)~\textit{ranking} function such that $u \preceq v$ implies $h(u) \leq h(v)$ for all $v,u \in \boldsymbol I_t$. 
 Notice that $h(u) = h(v)$ implies either $u \equiv v $ or $u, v \in \boldsymbol C_t$. 
-A~\textit{ranked rooted tree} and object $t = (\boldsymbol V_t, \boldsymbol E_t, \rho, \phi, h),\: t \in \mathbb{F}$.
+A~\textit{ranked rooted tree} is an object $t = (\boldsymbol V_t, \boldsymbol E_t, \rho, \phi, h),\: t \in \mathbb{F}$.
 We can supplement $t$ with a set of edge (branch) lengths $\boldsymbol b = \{b_1, b_2, \ldots, b_{2n-2} \}$, $\boldsymbol b \in \boldsymbol B \subseteq \mathbb{R}_{+}^{2n-2}$, creating a \textit{fully-ranked rooted phylogeny} in the form of the object $(t, \boldsymbol b) = \tau \in \boldsymbol\Psi$.
 For convenience, I will henceforth call $t$ a \textbf{topology} and $\tau$ a \textbf{phylogeny}.
 
@@ -230,13 +230,13 @@ If we associate an age in calendar time with each of the $2n-1$ nodes in a roote
 A convenient labelling is to make labels increase with age, such that $i > j$ implies $a_i \geq a_j$; thus, the root node will have label $2n-1$.
 An edge $e_{i,j}$ with $i > j$ represents an ancestral lineage and node $k$ in $\boldsymbol I_t$ corresponds to a \textit{coalescence} event of two ancestral lineages at time $a_k$.
 
-It is convenient to define $\boldsymbol a_L$ and $\boldsymbol a_L$ as the ages of the leaf and internal nodes, respectively.
+It is convenient to define $\boldsymbol a_L$ and $\boldsymbol a_I$ as the ages of the leaf and internal nodes, respectively.
 Also denote $\boldsymbol a  = (\boldsymbol a_I , \boldsymbol a_L) \in \boldsymbol A \subset \mathbb{R}_+^{2n-1}$.
-Hence there exists a bijective mapping $D : \boldsymbol B \rightarrow \boldsymbol A$ that maps the branch lengths of a TCP to its node ages.
+There exists a bijective mapping $D : \boldsymbol B \rightarrow \boldsymbol A$ that maps the branch lengths of a TCP to its node ages.
 In many phylodynamic applications, taxa are sampled through time, leading to~\textit{serially-sampled} data sets~\citep{Drummond2002}.
 Hence, here $\boldsymbol a_L$ is fixed (for any $\tau \in  \boldsymbol \Psi$) as it relates to the data collection process. 
 These sampling patterns are important because they alone impose constraints on the space of phylogenies.
-\cite{Gavryushkina2013} derive algorithms to count these objects show that the number of fully ranked phylogenies exceeds $R_n$. 
+\cite{Gavryushkina2013} derive algorithms to count these objects and show that the number of fully ranked phylogenies exceeds $R_n$. 
 In Figure~\ref{sfig:space_sizes} I show the ratio between the number of objects in the space we are interested in ($ F_n  = |\mathbb{F}|$) and $R_n$.
 
 \begin{figure}[!ht]
@@ -272,6 +272,40 @@ For serially-sampled phylogenies, the number of coalescent/sampling events (and 
 \end{proof}
 This small observation is useful for us to translate results that hold for SPR random walks on ultrametric trees ($\mathbb{T}$) to serially-sampled  ones ($\mathbb{F}$).
 
+\subsubsection{SPR graph}
+\label{sec:spr_stuff}
+
+The subtree-prune-and-regraft (SPR) operation picks a node in a tree $t$, prunes the subtree below that node and regrafts the subtree at a different node in the tree, creating a new tree $t^\prime$ (Figure~\ref{fig:spr}A).
+The SPR distance between two trees $x$ and $y$, $d_\text{SPR}(x, y)$, is then defined as the number of SPR operations needed to obtain $y$ from $x$ or vice-versa.
+When $x$ and $y$ are rooted trees, we sometimes also call $d_\text{SPR}$ the rSPR (rooted SPR) distance -- this has computational implications, since rSPR is much easier to compute.
+This distance is also biologically relevant, as it relates to \textit{horizontal gene transfer}, a major evolutionary mechanism in bacteria, for instance.
+
+One way to represent the space of phylogenies is to construct a graph $G_n = (V_n, E_n)$ where each vertex is a tree topology and an edge exists between two vertices if they are ``neighbours'' in a particular sense.
+In the SPR graph (Figure~\ref{fig:spr}B) two vertices (trees) $i$ and $j$ are connected (neighbours) iff  $d_\text{SPR}(i, j) = 1$.
+
+\begin{figure}[!ht]
+  \begin{center}
+  \subfigure[Two SPR operations]{ \includegraphics[width=0.495\textwidth]{\dir/figs/two_sprs.jpg} }
+  \subfigure[The SPR graph for $n=4$]{ \includegraphics[width=0.495\textwidth]{\dir/figs/spr_graph.jpg} }
+  \end{center}
+\caption{\textbf{Subtree prune-and-regraft}.
+Panel A  illustrates the subtree prune-and-regraft (SPR) operation: to transform the first tree into the second, the subtree containing $(4,5)$ is pruned and regrafted at the ancestor of $(1,2)$.
+The second SPR operation again prunes $(4,5)$ and regrafts the subtree at the ancestor of $\{2\}$.
+In panel B I show the SPR graph for $n=4$.
+Figures reproduced from~\cite{Whidden2017}.
+}
+\label{fig:spr}
+\end{figure}
+
+This graph-theoretic representation of phylogenetic space is useful in that studying random walks and percolation in the induced graph sheds light into the problem of traversing phylogenetic space.
+The SPR graph has been studied in some detail.
+For instance, we know that under an SPR random walk there exist Hamiltonian paths, that is, paths that visit each tree exactly once~\citep{Caceres2011}.
+~\cite{Whidden2017} employ an optimal transportation approach to define the curvature of the graph in sense of Ricci-Ollivier and show that the SPR graph is flat in the limit.
+Moreover they show that there might be negative curvature locally, namely for large topological rearrangements -- i.e. when two trees differ by one SPR operation that moves a large subtree.
+In practice this means that there might be ``bottlenecks'' between trees that differ by large subtree, which can impede efficient traversal of the graph.
+Finally,~\cite{Whidden2015} use the SPR graph representation to quantify the exploration of phylogenetic space by Markov chain Monte Carlo (MCMC) algorithms.
+I rely on this representation in the proofs of some assertions throughout the thesis, specially in Chapter 2.
+
 \subsubsection{The Billera-Holmes-Vogtmann space}
 
 Phylogenetic space does not admit a canonical parametrisation, and hence there are a plethora of representations in the literature.
@@ -279,7 +313,7 @@ Here I will present the parametrisation put forth by~\cite{Billera2001}, since i
 The first step in constructing the Billera-Holmes-Vogtmann (BHV) space is to associate each possible tree topology with an~\textit{orthant} $\boldsymbol O_i,\: i = 1, 2, \ldots, F_n$, which corresponds to an embedding of the non-negative real numbers such that $\boldsymbol O_i \subset \mathbb{R}_+^{2n-2}$.
 We are then prepared to construct an~\textit{orthant complex} $\boldsymbol \chi$ consisting of orthants of dimension $N = 2n-2$ being joined at the origin and indexed by the countable set $\Gamma$ such that (a) $\boldsymbol O_i \cap \boldsymbol O_j$ is a face of both orthants for all $\boldsymbol O_i,\boldsymbol O_j \in \boldsymbol
 \chi$ and (b) each $x \in \boldsymbol\chi$ belongs to a finite number of orthants~\citep{Dinh2017}.
-The orthants in this space are separated by nearest neighbour interchange (NNI) operation.
+The orthants in this space are separated by a nearest neighbour interchange (NNI) operation.
 An schematic representation of the BHV orthant complex space is show in Figure~\ref{fig:bhv_representation}.
 
 \begin{figure}[!ht]
@@ -298,7 +332,7 @@ For two phylogenies with the same tree topology, the BHV distance can be compute
 When trees have different topologies, one needs to compute the total path length necessary to travel the edge of the orthants.
 This intuitively accounts for the fact that phylogenies that differ in topology as well as in branch lengths are more different and hence should be more distant. 
 This metric has many desirable properties, including allowing for a unique representation of a ``mean'' tree, which is useful when the goal is to summarise a set of trees, for instance.
-\cite{Owen2011} propose an efficient way of finding the geodesic path between trees, but computing the BHV distance between any two trees remains a computationally hard task, and is substantially more expensive to compute when compared with the RF distance, for example.
+\cite{Owen2011} propose an efficient way of finding the geodesic path between trees, but computing the BHV distance between any two trees remains a computationally hard task, and is substantially more expensive to compute when compared with the Robinson-Foulds (RF) distance~\citep{Robinson1981}, for example (see Chapter 3 for definitions of many phylogenetic metrics).
 
 \subsubsection{Clade space}
 
@@ -307,7 +341,7 @@ An example of a split is $\{A, B, C\} | \{ D, E\}$, where $A, B, C, D$ and $E$ a
 We will refer to the set of all possible splits on $n$ taxa as $\boldsymbol C$.
 For $n \geq 3$ taxa, there are $|\boldsymbol C| = 2^{n-1}-1$ possible splits, and a given tree can contain at most $2n-2$ splits.
 Two splits $U_1 | V_1$ and $U_2 | V_2$ are said to be \textit{compatible} iff at least one of the intersections $U_1 \cap U_2$, $U_1 \cap V_2$, $V_1 \cap U_2$ and $U_1 \cap U_2$ is empty.
-Let $\boldsymbol C^\star \subset \boldsymbol C$ be  the space of pairwise compatible clades,~\textit{i.e.}, S $\boldsymbol x \in \boldsymbol C^\star$ iff all clades in $\boldsymbol x$ are pairwise compatible.
+Let $\Omega(\boldsymbol C)$ be the $\sigma$-algebra of of $\boldsymbol C$ and let $\boldsymbol C^\star \subset \Omega(\boldsymbol C)$ be  the space of pairwise compatible clades,~\textit{i.e.}, S $\boldsymbol x \in \boldsymbol C^\star$ iff all clades in $\boldsymbol x$ are pairwise compatible.
 \begin{theorem}
 \label{thm:splitstheorem}
  Splits-equivalence~\citep{Buneman1971}: if $\boldsymbol c$ is set of pairwise compatible splits, then there exists one and only one topology $t$ that corresponds to $\boldsymbol c$.
@@ -388,7 +422,7 @@ While the coalescent offers a flexible framework for modelling the population dy
 For instance, the coalescent assumes that the fraction of sampled individuals (number of taxa, $n$) is a negligible fraction of total population~\citep{Fu2006,Volz2009}.
 With the rapid increase in the number of sequences, it is quite possible that most cases in an epidemic could be sampled, therefore rendering this assumption problematic.
 To address this and also allow for more explicit models of epidemic dynamics, several models based on birth-death processes,~\cite{Volz2009},~\cite{Rasmussen2011} and~\cite{Stadler2011} have developed approaches that incorporate other population models such the Yule process and epidemic models such as the Susceptible-Infected-Removed (SIR) model.
-Similarly to the coalescent, these models too can be used as prior measures for phylogenies, and in addition be used to estimate parameters of interest such as $R_0$.
+Similarly to the coalescent, these models too can be used as prior measures for phylogenies, and in addition be used to estimate parameters of interest such as the basic reproductive number, $R_0$.
 
 \section{Markov chain Monte Carlo}
 \label{sec:mcmc}
@@ -399,12 +433,12 @@ For ease of exposition, whenever a choice is to be made between a discrete and a
 
 Suppose one aims to sample from a distribution\footnote{I will assume the target is either normalised or can be normalised,~\textit{i.e.}, $ 0 < \int_{\mathcal{X}} \pi_d(x) <\infty$. } $\pi(\cdot)$ defined on a sample space $\mathcal{X}$, with density $\pi_d$ such that $\forall U \subseteq \mathcal{X}$
 \[ \pi(U) = \frac{\int_{U} \pi_d(x)dx }{\int_{\mathcal{X}} \pi_d(x)dx}. \]
-One reason to obtain samples from $\pi(\cdot)$ is to compute expectations of functionals $f :\mathcal{X} \to \mathbb{R}$ such that
-\[ \pi(f) = \mathbb{E}_{\pi} [f(X)] = \int_{\mathcal{X}} f(x) \pi(x) dx. \] 
-Classic Monte Carlo theory says that, under some mild regularity conditions, if one obtains a sample of i.i.d. random variables $\boldsymbol Z = \{ Z^{(1)}, Z^{(2)}, \ldots, Z^{(N)} \} \sim \pi(\cdot)$, then
-\[ \hat{\pi}(f) = N^{-1}\sum_{i=1}^N f(Z^{(i)}), \]
-is an unbiased estimate of $\pi(f)$.
-Moreover, the standard deviation of $\hat{\pi(f)}$ is $\mathcal{O}(\frac{1}{\sqrt{N}})$, meaning we can make the estimate as precise as desired by increasing the number of samples $N$.
+One reason to obtain samples from $\pi(\cdot)$ is to compute expectations of (Borel-measurable) functionals $g :\mathcal{X} \to \mathbb{R}$ such that\footnote{It is important to note that $\pi_d$ is normalised in this setting.}
+\[\mu_g := \mathbb{E}_{\pi} [g(X)] = \int_{\mathcal{X}} g(x) \pi_d(x) dx. \] 
+Classic Monte Carlo theory says that, under some mild regularity conditions, if one obtains a sample of i.i.d. random variables $\boldsymbol Z = \{ Z^{(1)}, Z^{(2)}, \ldots, Z^{(N)} \} \sim \pi$, then
+\[ \widehat{\mu_g} = N^{-1}\sum_{i=1}^N g(Z^{(i)}), \]
+is an unbiased estimate of $\mu_g$.
+Moreover, the standard deviation of $\widehat{\mu_g}$ is $\mathcal{O}(\frac{1}{\sqrt{N}})$, meaning we can make the estimate as precise as desired by increasing the number of samples $N$.
 Obtaining $\boldsymbol Z$ directly, however, might be impractical.
 Instead, Markov chain Monte Carlo (MCMC) is a technique to draw samples by constructing a Markov chain $\{X_i\}$ on $\mathcal{X}$ that has $\pi(\cdot)$ as its~\textit{limiting} (or stationary) distribution. 
 More formally, we want to construct $\{X_i\}$ with transition probabilities $P(x, dy)$ such that
@@ -427,26 +461,27 @@ Now consider a Markov chain $Q_\sigma(x, \cdot)$ such that $Q_\sigma(x, y) \prop
 The so-called Metropolis-Hastings (MH) algorithm~\citep{Metropolis1953,Hastings1970} consists of constructing a Markov chain with acceptance probability
 \begin{equation}
  \label{eq:acceptance}
- \alpha_\sigma(x, y) = min \left[1, \frac{\pi_d(y) q_\sigma(y, x)}{\pi_d(x) q_\sigma(x, y)} \right],
+ \alpha_\sigma(x, y) = \min \left[1, \frac{\pi_d(y) q_\sigma(y, x)}{\pi_d(x) q_\sigma(x, y)} \right],
 \end{equation}
-with $\alpha_\sigma(x, y) = 1$ if $\pi_d(x) q_\sigma(x, y) = 0$.
+with $\alpha_\sigma(x, y) = 1$ if $\pi_d(x) q_\sigma(x, y) = 0$~\citep[p. 329]{Chib1995}.
 The quantity $q_\sigma(y, x)/ q_\sigma(x, y)$ is called the ``Hastings ratio'' and acts as a correction factor to ensure we sample from the desired target (see below).
 
 Computationally, MH can be described as generating samples $\boldsymbol Z$ as follows:
 \begin{enumerate}
  \setcounter{enumi}{-1}
- \item Pick some $Z^{(0)} \in \mathcal{X}$;
+ \item Pick some $Z^{(0)} \in \mathcal{X}$ with $\pi_d(Z^{(0)}) > 0$;
+ 
+ for $n = 0$ to $M$:
  \item Given $Z^{(n)}$, generate a \textit{proposal} $Y^{(n + 1)} \sim Q_\sigma(Z^{(n)}, \cdot)$;
  \item Sample $u \sim \text{Uniform}(0, 1)$;
  \item If $\alpha_\sigma(Z^{(n)},  Y^{(n + 1)}) > u$, set $Z^{(n + 1)} = Y^{(n + 1)}$, otherwise $Z^{(n + 1)} = Z^{(n)}$ ;
- \item Repeat steps 1 through 3 until $M$ samples are obtained.
 \end{enumerate}
 This can be shown to correctly sample from $\pi(\cdot)$ for appropriately chosen $q_\sigma(\cdot, \cdot)$ (see below) and is straightforward to implement on a computer.
 The MH algorithm is a very popular workhorse of MCMC, much due to its simplicity of implementation.
 Good introductions can be found in~\cite{Chib1995} and~\cite{Robert2015}.
 
 While the MH algorithm is by far the most popular algorithm in MCMC, it is by no means the only one.
-A very popular method is the Gibbs sampler~\citep{Geman1984}, an algorithm whereby samples $\pi(\cdot)$ are drawn from a series of conditional distributions, which can be quite useful when sampling Bayesian posterior distributions based on conjugate priors.
+A very popular method is the Gibbs sampler~\citep{Geman1984}, an algorithm whereby samples from $\pi(\cdot)$ are drawn from a series of conditional distributions, which can be quite useful when sampling Bayesian posterior distributions based on conjugate priors.
 When sampling from spaces with varying dimension, the so-called ``Reversible-jump'' MCMC of~\cite{Green1995} has enjoyed great success.
 Perhaps not surprisingly, many of these algorithms are special instances of a more general sampling procedure, as shown by~\cite{Keith2004}.
 A common criticism of MH is the fact that the transitions (step 3 above) do not take into account the structure of the target, often leading to random-walk behaviour.
@@ -467,8 +502,8 @@ In section~\ref{sec:practical} I briefly discuss some of the aspects, both pract
 Further discussion of transition kernels in MCMC for Bayesian phylogenetics can be found in Chapters 2 and 6.
 
 For complex parameter spaces, the construction of the proposal might be quite complicated, and the the density  $q_\sigma(\cdot, \cdot)$ might be hard to compute.
-\citep{Green2003} proposes a constructive method for computing the acceptance ratio that simplifies calculations, specially when considering varying-dimension problems.
-Denote the current state of the chain is $x$ and the proposed (candidate) state is $x^\prime$.
+\cite{Green2003} proposes a constructive method for computing the acceptance ratio that simplifies calculations, specially when considering varying-dimension problems.
+Denote the current state of the chain by $x$ and the proposed (candidate) state by $x^\prime$.
 The main idea is to sample a set of auxiliary random variables $\boldsymbol u \in \boldsymbol U$ from a distribution $g(\cdot)$ and then apply a transformation $h : \mathcal{X} \times \boldsymbol U \to \mathcal{X} $ such that $x^\prime = h(x, \boldsymbol u)$.
 To obtain $x$ from $x^\prime$ the procedure is to generate a set $\boldsymbol u^\prime \in \boldsymbol U$ from a (potentially different) distribution $g^\prime(\cdot)$ and apply a transform $h^\prime : \mathcal{X} \times \boldsymbol U \to \mathcal{X}$ to get $x = h^\prime(x^\prime, \boldsymbol u^\prime)$.
 The acceptance probability can then be written as 
@@ -483,7 +518,7 @@ See~\cite{Holder2005} for an application of this technique in Bayesian phylogene
 \label{sec:practical}
 
 In practice, there are many details that determine the effectiveness of MCMC as a numerical method.
-One of the key challenges in efficiently computing an approximation of the target is the boldness of the proposing mechanism: propose extreme (bold) values and the candidate is likely to be rejected, making the chain be stuck for long periods; propose conservatively and the candidate is likely to be accepted but the chain will seldom move away from the current state, leading to poor exploration.
+One of the key challenges in efficiently computing an approximation of the target is the boldness of the proposing mechanism: propose extreme (bold) values and the candidate is likely to be rejected, making the chain be stuck for long periods; propose conservatively and the candidate is likely to be accepted but the chain will move very little away from the current state, leading to poor exploration.
 It is therefore desirable to construct the candidate generating density so as to strike the best balance between bold and conservative proposals, a problem called optimal scaling~\citep{Roberts1998,Roberts2001}.
 \cite{Gelman1996} suggest that under some regularity conditions on the target $\pi(\cdot)$, an acceptance probability of $0.234$ when the dimension of $\mathcal{X}$ is large enough will produce optimal sampling when compared with independent samples from $\pi(\cdot)$. 
 More modern algorithms are~\textbf{adaptive}, meaning the transition kernel indexing parameter $\sigma$ can be ``tuned'' using the previous history of the chain to achieve the optimal acceptance probability~\citep{Haario2001}.
@@ -512,7 +547,7 @@ See chapter 3 for a first -- and informal --  stab at characterising the typical
 Contrary to what is routinely suggested in the literature, MCMC is not a Bayesian method.
 Rather, MCMC is a computational method for approximating integrals and is completely agnostic about what is being computed.
 As a counter-example to the claim the MCMC is ``Bayesian'' in any way, I offer~\cite{Geyer1991} and~\cite{Kuhner1998}, who employ MCMC for maximum likelihood estimation\footnote{See also~\url{http://users.stat.umn.edu/~geyer/mcmc/diag.html} -- also cited in Chapter 3 -- for the precious quote: ``[MCMC] isn't even statistics, it is a tool.''. Terms such as ``Bayesian MCMC'' make no sense whatsoever. }.
-Moreover, MCMC is not the only tool to compute integrals and approximate distributions; particle filtering -- also called sequential Monte Carlo --\citep{DelMoral1996}), rejection sampling~\citep{Casella2004} and importance sampling~\citep{Rubinstein2016} are examples of techniques that do not involve the construction of Markov chains.
+Moreover, MCMC is not the only tool to compute integrals and approximate distributions; particle filtering -- also called sequential Monte Carlo --\citep{Gordon1993, DelMoral1996} --, rejection sampling~\citep{Casella2004} and importance sampling~\citep{Rubinstein2016} are examples of techniques that do not involve the construction of Markov chains.
 
 \section{Software}
 \label{sec:software}
@@ -530,13 +565,13 @@ R offers an enormous variety of user-contributed packages which greatly expand t
 I have used the \textbf{ape}~\citep{Paradis2004},~\textbf{parallel}~\citep{R2017},~\textbf{ggplot2}~\citep{Wickham2009},~\textbf{viridis}~\citep{Garnier2018} and~\textbf{data.table}~\citep{Dowle2017} packages repeatedly across several projects.
 This list is by no means exhaustive; please see the individual chapters for more details on the R packages (and other software) I have used in each of the projects.
 BEAST (see below) is written in the cross-platform JAVA language (\url{https://java.com/}) and I have used the Eclipse IDE (\url{https://www.eclipse.org/ide/}) to aid both code reading and minor development.
-Finally, I would like to mention that I have made extensive usage of the excellent version-control system \verb|git| and the associated code hosting service GitHub (\url{https://github.com/}.
-This thesis was written using the open-source typesetting language \LaTeX and its source code is hosted at~\url{https://github.com/maxbiostat/PhD_Thesis}.
+Finally, I would like to mention that I have made extensive usage of the excellent version-control system \verb|git| and the associated code hosting service GitHub (\url{https://github.com/}).
+This thesis was written using the open-source typesetting language \LaTeX\: and its source code is hosted at~\url{https://github.com/maxbiostat/PhD_Thesis}.
 
 \subsubsection{BEAST}
 \label{sec:beast}
 
-The software package BEAST, short for \textbf{B}ayesian \textbf{E}volutionary \textbf{A}nalysis by \textbf{S}ampling \textbf{T}rees\citep{Drummond2007,Drummond2012} is a central focus of this thesis.
+The software package BEAST, short for \textbf{B}ayesian \textbf{E}volutionary \textbf{A}nalysis by \textbf{S}ampling \textbf{T}rees~\citep{Drummond2007,Drummond2012,Suchard2018} is a central part of this thesis.
 BEAST is specially designed for the estimation of rooted phylogenies from genetic sequences, with a heavy focus on time-calibrated phylogenies.
 It offers a large number of tree priors (coalescent- and non coalescent-based models) as well as specialised computational machinery for the construction and estimation of discrete and continuous phylogeographic models~\citep{Lemey2009,Lemey2010,Pybus2012,Dudas2017}.
 The interested reader is referred to the on-line documentation (\url{http://beast.community/}) for more information.
