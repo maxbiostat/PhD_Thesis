@@ -15,21 +15,22 @@ In Bayesian phylogenetics one is usually interested in computing the posterior d
 where $D$ is observed data and $t \in \mathbb{F}$ is a fully-ranked tree topology associated set of branch lengths $\boldsymbol b$. %TODO: maybe $\boldsymbol b(t)$?
 Finally $\boldsymbol \theta$ is a set of parameters such as substitution model parameters, migration rates, heritability coefficients, etc.
 In many applications, the aim is to construct time-calibrated phylogenies, i.e. phylogenetic trees whose branch lengths are measured in units of calendar time.
-In particular, one might have sequences sampled through time (heterochronous) which enable direct estimation of the rate of evolution and reconstruction of past population dynamics~\citep{Drummond2002, Drummond2005}.
+In particular, one might have sequences sampled through time (heterochronous/serially-sampled) which enable direct estimation of the rate of evolution and reconstruction of past population dynamics~\citep{Drummond2002, Drummond2005}.
 These types of data sets pose additional challenges to inference because they impose constraints\footnote{More specifically temporal precedence constraints.} on the space of valid trees~\citep{Stadler2013}.
 
 \subsection{MCMC in phylogenetic space}
 \label{sec:tree_mcmc}
 
 One of the main features of the Bayesian  approach is to allow parameter inference and hypothesis testing whilst accommodating phylogenetic uncertainty~\citep{Suchard2001, Huelsenbeck2002, Lemey2014, Cybis2015, Baele2015, Baele2017}.
-This treatment of uncertainty is achieved by integrating (marginalising) over the space of phylogenies, which depends crucially on efficiently traversing tree space.
-Even for the simplest models, the distribution in~(\ref{eq:posterior}) cannot be computed analytically -- except for exhaustive iteration of all possible tree topologies --, requiring numerical approximation, usually accomplished through Markov chain Monte Carlo (MCMC).
-The use of MCMC for Bayesian methods in phylogenetics has grown steadily since its introduction in the late 1990s and early 2000s~\citep{Kuhner1995,Sinsheimer1996, Rannala1996, Yang1997, Mau1999, Li2000, Suchard2001,Drummond2002}, with software packages such as Mr Bayes~\citep{Ronquist2012} and BEAST~\citep{Drummond2012} becoming widely used by researchers in a broad range of disciplines~\citep{Murphy2001, Bouckaert2012, Lemey2014}.
+This treatment of uncertainty is achieved by integrating (marginalising) over the space of phylogenies, a task which depends crucially on efficiently traversing tree space.
+Even for the simplest models, the distribution in~(\ref{eq:posterior}) cannot be computed analytically requiring numerical approximation, usually accomplished through Markov chain Monte Carlo (MCMC).
+The use of MCMC for Bayesian methods in phylogenetics has grown steadily since its introduction in the late 1990s and early 2000s~\citep{Kuhner1995,Sinsheimer1996, Rannala1996, Yang1997, Mau1999, Li2000, Suchard2001,Drummond2002}, with software packages such as Mr Bayes~\citep{Ronquist2012} and BEAST~\citep{Drummond2012,Suchard2018} becoming widely used by researchers in a broad range of disciplines~\citep{Murphy2001, Bouckaert2012, Lemey2014}.
 
 The Metropolis-Hastings (MH) algorithm~\citep{Metropolis1953, Hastings1970} is a very popular MCMC technique due to its generality and ease of implementation.
 % In MH, a Markov chain is constructed such that its limiting distribution is the desired posterior distribution. 
-For ease of presentation, let $\tau = \{ t, \boldsymbol b\}$ be a phylogeny and $q_{\gamma}(\tau^\prime|\tau)$ be a conditional distribution indexed by a parameter $\gamma$ from which a new state $\tau^\prime$ can be proposed from a current state $\tau$, which we call a \textbf{candidate-generating distribution}.
-It can be shown that accepting/rejecting a new state $\tau^\prime$ based on the ratio\footnote{I will drop the dependence of the posterior on $\boldsymbol\theta$ for convenience of notation. One should however keep in mind some parameters are strongly correlated with the phylogeny $\tau$.} $A_{\gamma}(\tau | \tau^\prime) = min\left(1, \frac{p(\tau^\prime | D)q_{\gamma}(\tau|\tau^\prime)}{p(\tau | D)q_{\gamma}(\tau^\prime|\tau)}\right)$ leads to the desired distribution for a suitably constructed proposal mechanism.
+For ease of presentation, let $\tau = \{ t, \boldsymbol b\}$ be a phylogeny and $q_{\gamma}(\tau^\prime|\tau)$ be a conditional distribution indexed by a parameter $\gamma$ from which a new state $\tau^\prime$ can be proposed from a current state $\tau$.
+We call $q_{\gamma}(\tau^\prime|\tau)$ a \textbf{candidate-generating distribution}.
+It can be shown that accepting/rejecting a new state $\tau^\prime$ based on the ratio\footnote{I will drop the dependence of the posterior on $\boldsymbol\theta$ for convenience of notation. One should however keep in mind some parameters may be strongly correlated with the phylogeny $\tau$.} $A_{\gamma}(\tau | \tau^\prime) = min\left(1, \frac{p(\tau^\prime | D)q_{\gamma}(\tau|\tau^\prime)}{p(\tau | D)q_{\gamma}(\tau^\prime|\tau)}\right)$ leads to the desired distribution for a suitably constructed proposal mechanism.
 
 There are no ``default'' choices for the candidate-generating distribution $q_{\gamma}(\cdot|\cdot)$; it must be chosen with the target distribution (in this case the Bayesian posterior) in mind.
 Moreover, the efficiency of MCMC algorithms in approximating the target distribution depends crucially on the choice of transition kernel~\citep{Brooks2003,AlAwadhi2004,Yang2013,Thawornwattana2017}.
@@ -41,7 +42,7 @@ Given the clear advantage of adaptive MCMC over non-adaptive implementations for
 The authors point out that clock-constrained trees impose additional restrictions on the state space of the MCMC algorithm and hence that performance could be increased by developing transition kernels that took the extra information provided by tip dates.
 They develop two such kernels: Fixed node-height Prune-and-Regraft (FNPR) and Intermediate Exchange (IE).
 FNPR finds a ``target'' node (excluding the root and its two children) at random, prunes it and regrafts the resulting subtree at a ``destination'' node in the tree at the same height at random.
-Intermediate Exchange is similar in spirit, but the regraft node  is not chosen at random. 
+Intermediate Exchange is similar in spirit, but the regraft node  is not chosen uniformly. 
 Instead, IE is constructed to prefer local rearrangements, by picking closer nodes with a higher probability (see below and section II in~\cite{Hoehna2008} for details).
 A limitation of FNPR nor IE is that they are not adaptive.
 
@@ -50,7 +51,7 @@ The idea behind their ``Metropolised'' Gibbs samplers is to maximise transition 
 This is accomplished by prohibiting the current state as a proposed state, leading to a transition probability of one.
 The kernels developed in~\cite{Hoehna2012} use a weighting scheme based on conditional clade probabilities (CCP) to guide transitions between trees.
 A move to a tree with a lower CCP score is thus less likely, whilst a move that increases the score has a higher probability of being accepted.
-A limitation of these metropolised transition kernels is that CCP scores require normalisation over all trees~\citep{Larget2013} and hence can be cumbersome to calculate.
+A limitation of these Metropolised transition kernels is that CCP scores require normalisation over all trees~\citep{Larget2013} and hence can be cumbersome to calculate.
 
 More recently,~\cite{Dinh2016} and~\cite{Fourment2017} develop ``guided'' candidate-generating mechanisms for on-line Bayesian phylogenetics via sequential Monte Carlo, which makes use of a surrogate function to make computations feasible.
 While that is an active field of research, it relies on machinery not yet extended to the time-calibrated case.
@@ -80,13 +81,13 @@ Here we will define $h(i) = l_{max} - l_i$ and $l_i = \sum_{k \in \mathbf{W_i}} 
 It is also convenient to define $P_i$, $G_i$ and $S_i$ as the parent, grandparent and sibling of node $i$, respectively.
 With this notation in mind, call $p_i = h(P_i)-h(i)$, $g_i = h(G_i)-h(P_i)$ and $q_i = h(P_i)-h(S_i)$ the corresponding branch lengths.
 The most recent common ancestor of nodes $i$ and $j$, $\text{mrca}_{ij}$ is the first node in which the paths $\mathbf{W_i}$ and $\mathbf{W_j}$ intersect.
-Finally, let $d(i, j) = 2h(\text{mrca}_{ij}) - [ h(i)  + h(j) ]$ be the patristic (path) distance between nodes $i$ and $j$ on the phylogeny.
+Finally, let $\Delta_{ij} = 2h(\text{mrca}_{ij}) - [ h(i)  + h(j) ]$ be the patristic (path) distance between nodes $i$ and $j$ on the phylogeny.
 
 \subsubsection*{SubTreeJump} 
 
 The first transition kernel I propose, \textit{SubTreeJump} (STJ)\footnote{An alternative name for STJ is generalised fixed node height prune and regraft, gFNPR.}, is similar in spirit to both Intermediate Exchange and FNPR.
 STJ extends IE by introducing a tuning parameter $\alpha$ that controls how local rearrangements are.
-The idea is to make the probability of moving node $i$ to $j$ proportional to $l_{ij}^\alpha$ instead $l_{ij}$ as in Intermediate Exchange.
+The idea is to make the probability of moving node $i$ to $j$ proportional to $\Delta_{ij}^\alpha$ instead of $\Delta_{ij}$ as in Intermediate Exchange.
 The necessary steps to perform a SubTreeJump operation on $\tau$ in order to propose a phylogeny $\tau^\prime$ are described in detail in Box~\ref{alg:stj} and an illustration is provided in Figure~\ref{fig:stj}.
 This allows one to favour bold moves away from $i$ ($\alpha > 0$) or more conservative moves closer to $i$ ($\alpha < 0$).
 Notice that SubTreeJump is equivalent to FNPR for $\alpha = 0$.
@@ -100,11 +101,11 @@ One can then define the SubTreeJump candidate-generating density as $q_{\alpha}(
  
  Determine $P_i$ and compute $h(P_i)$;
  
- Construct the set of destination nodes $\mathbf{D_i} = \{ d \in \mathbf{D_i}  : h(d) \leq h(P_i) < h(P_d) \}$;
+ Construct the set of destination nodes $\mathbf{D_i} = \{ d : h(d) \leq h(P_i) < h(P_d) \}$;
  
  For all $k \in \mathbf{D_i}$, compute $l_{ik}$;
  
- For some fixed $\alpha \in \mathbb{R}$, pick a node $j$ with probability $Pr(i\to j) = \frac{(l_{ij})^{\alpha}}{\sum_{d \in \mathbf{D_i}}(l_{id})^{\alpha}}$;
+ For some fixed $\alpha \in \mathbb{R}$, pick a node $j$ with probability $Pr(i\to j) = \frac{\Delta_{ij}^{\alpha}}{\sum_{d \in \mathbf{D_i}}\Delta_{id}^{\alpha}}$;
  
  Prune the phylogeny at $P_i$ and regraft the resulting subtree at $P_j$, creating a new phylogeny $\tau^\prime$. 
  
@@ -117,8 +118,8 @@ Hence one needs to compute the \textit{Hastings ratio} $q_{\alpha}(\tau|\tau^\pr
 To get a reverse move from $\tau^\prime$ back to $\tau$, one needs to pick the original target node $i$  -- which is guaranteed to exist in $\mathbf{D_j}$ -- as a destination. 
 The Hastings ratio is then\footnote{Note that I omit the node-picking probability $1/(2n-4)$ because it is the same for both moves. If one were to devise a kernel with non-uniform node-picking probabilities, these would have to be included in the Hastings ratio.}
 \begin{align}
- \frac{q_{\alpha}(\tau| \tau^\prime)}{q_{\alpha}(\tau^\prime| \tau) }  &= \frac{(l_{ji})^{\alpha}}{\sum_{d^\prime \in \mathbf{D_j}}(l_{jd^\prime})^{\alpha}} /\frac{(l_{ij})^{\alpha}}{\sum_{d \in \mathbf{D_i}}(l_{id})^{\alpha}}, \nonumber \\
- &  = \frac{\sum_{d \in \mathbf{D_i}}(l_{id})^{\alpha}}{\sum_{d^\prime \in \mathbf{D_j}}(l_{jd^\prime})^{\alpha}}.
+ \frac{q_{\alpha}(\tau| \tau^\prime)}{q_{\alpha}(\tau^\prime| \tau) }  &= \frac{\Delta_{ij}^{\alpha}}{\sum_{d^\prime \in \mathbf{D_j}}\Delta_{id^\prime}^{\alpha}} /\frac{\Delta_{ij}^{\alpha}}{\sum_{d \in \mathbf{D_i}}\Delta_{id}^{\alpha}}, \nonumber \\
+ &  = \frac{\sum_{d \in \mathbf{D_i}}\Delta_{id}^{\alpha}}{\sum_{d^\prime \in \mathbf{D_j}}\Delta_{jd^\prime}^{\alpha}}.
 \end{align}
 
 I note two limitations of this transition kernel.
@@ -127,7 +128,6 @@ This ``granularity'' of the kernel density causes problems for most adaptation s
 % becomes irrelevant for large trees, but remains an issue for very small trees ($<10$ taxa).
 Secondly, SubTreeJump on its own does not necessarily induce an irreducible Markov chain on the space of rooted topologies  -- see Section~\ref{sec:stx_properties} for a counterexample/proof.
 This can be easily remedied by combining STJ with branch length candidate-generating mechanisms.
-%TODO: MAS: It is not the transition kernel w.r.t.~the topology $\tau$ that concerns me much.  It's the kernel w.r.t.~the inter-coalescent intervals (the natural parameterization of our priors) that we need to confirm.
 Since STJ  (and FNPR) does not change node heights or numbers of lineages, it does not change the density under the coalescent prior,~\textit{i.e.} $\pi(\tau) = \pi(\tau^\prime)$.
 Whether this is a desirable property is an open question.
 The disconnect between proposals in topological space and branch length space could be undesirable due to it failing to account for the dependence between topology and branch lengths.
@@ -172,7 +172,7 @@ See Box~\ref{alg:stl} for details.
      
      \Fn{getDestinations}{
      \In{ A tree $\tau$, a node $i$ and a scalar $\delta$.}
-     \Out{A set $\mathbf{D_i}(\delta) = \{c \in \mathbf{D_i}(\delta)  : d(c, i) \leq \delta \}$.}
+     \Out{A set $\mathbf{D_i}(\delta) = \{c  : d(c, i) \leq \delta \}$.}
      \setcounter{AlgoLine}{-1}
      
       Determine $P_i$, $S_i$ and $G_i$;
@@ -182,11 +182,11 @@ See Box~\ref{alg:stl} for details.
       Compute $h_{b} =  p_i - \delta$; 
      
       \If{$h_b > h(i)$}{
-         Go down the subtree subtended by $s_i$ and find all nodes that intersect at height $h_b$ constructing the set $\mathbf{D^{(b)}_i} = \{ d \in \mathbf{D^{(b)}_i}  : h(d) \leq h_b < h(P_d) \}$\;
+         Go down the subtree subtended by $s_i$ and find all nodes that intersect at height $h_b$ constructing the set $\mathbf{D^{(b)}_i} = \{ d : h(d) \leq h_b < h(P_d) \}$\;
     }
       Compute $h_{a} =  h(P_i) + \delta$;
       
-      Walk up to the root and find all nodes that intersect at height $h_a$ constructing the set $\mathbf{D^{(a)}_i} = \{ d \in \mathbf{D^{(b)}_i}  : h(d) \leq h_b < h(P_d) \}$\;
+      Walk up to the root and find all nodes that intersect at height $h_a$ constructing the set $\mathbf{D^{(a)}_i} = \{ d : h(d) \leq h_b < h(P_d) \}$\;
       
     \Return $\mathbf{D_i}(\delta) = \mathbf{D^{(b)}_i}(\delta) \cup \mathbf{D^{(a)}_i(\delta)} $
      }
@@ -205,7 +205,7 @@ See Box~\ref{alg:stl} for details.
 % \end{center}
  \caption[Schematic representation of a SubTreeLeap proposal]{\textbf{Schematic representation of a SubTreeLeap proposal}.
  SubtreeLeap operation with size  $\delta^\prime = 1.6$ on $\tau$ to obtain the proposal phylogeny $\tau^\prime$.
- Target node represented by the green triangle and the height of its parent (green circle) marked by a dotted line; valid destination nodes marked with pink squares, invalid (prohibited) with black squares.
+ Target node represented by the green triangle and the height of its parent (green circle) marked by a dotted line; valid destination nodes marked with pink squares, invalid (prohibited) destinations are marked with black squares.
 %  Starting from a phylogeny $\tau$, excluding the root pick a node $i$ uniformly at random (red triangle) and distance $\delta^\prime = 1.6$ from the kernel $\kappa(\delta | \sigma)$ (blue distribution).
 %  Find the possible destination(s) that are distance $\delta^\prime$ from $P_i$, whose height is marked with a dotted line.
 %  The destination nodes are represented by  pink squares, their heights marked by dashed lines.
@@ -218,7 +218,7 @@ See Box~\ref{alg:stl} for details.
 \end{figure}
 
 Like SubTreeJump, SubTreeLeap is also not symmetric, hence we need to compute the Hastings ratio $q_{\sigma}(\tau|\tau^\prime)/q_{\sigma}(\tau^\prime|\tau)$.
-In order to get back to $\tau$ from $\tau^\prime$ one would first need to draw the same distance $\delta$ from $\kappa(\cdot)$. 
+In order to get back to $\tau$ from $\tau^\prime$ one would first need to draw the same distance $\delta^\prime = \delta$ from $\kappa(\cdot)$. 
 Then one needs to realise that the original node $i$ is guaranteed to exist in the set of destinations $\mathbf{D_j}$ -- but $\mathbf{D_j} \neq \mathbf{D_i}$.
 Hastings ratio is then 
 \begin{align}
@@ -226,8 +226,7 @@ Hastings ratio is then
  & = \frac{|\mathbf{D_i}(\delta)|}{|\mathbf{D_j}(\delta^\prime)|}
 \end{align}
 One needs to draw the exact same distance $\delta^\prime = \delta$ to be able to get the original node in the destination set and hence produce $\tau$ from $\tau^\prime$.
-This means the densities $\kappa(\delta^\prime | \sigma)$ and $\kappa(\delta| \sigma)$ -- independently of the choice of distance kernel\footnote{As long as $\kappa(\cdot)$ is strictly positive and unbounded (see Remark~\ref{rmk:stl_K_irreducible}).} --  cancel out in the Hastings ratio leaving only the discrete component to be computed.
-See Section~\ref{sec:stx_properties} for the transition kernel induced by \verb|STL| on the space of coalescent intervals, which are the random variables of the model prior.
+This means the densities $\kappa(\delta^\prime | \sigma)$ and $\kappa(\delta| \sigma)$ -- independently of the choice of distance kernel\footnote{As long as $\kappa(\cdot)$ is strictly positive and unbounded (see Remark~\ref{rmk:stl_irreducible_F}).} --  cancel out in the Hastings ratio leaving only the discrete component to be computed.
 
 This construction is complicated and deserves a bit more consideration.
 Let $m_i = \min(g_i, q_i)$ and consider $j$ as a virtual destination node.
@@ -236,48 +235,50 @@ Depending on the magnitude of the distance $\delta$, a range of rearrangements i
 \begin{enumerate}[label=\Alph*)]
  \item Complete slide move (CSM): if $\delta < p_i$ and $\delta < m_i$, the regraft point will lie either on the branch subtending $P_i$ or the one subtended by $P_i$;
  \item Partial slide move (PSM): if $\delta < p_i$ but $\delta > m_i$, there is only one destination -- above $P_i$ -- because moves that extend $p_i$ below are forbidden due to the restrictions imposed by fixed sampling times.
- \item Same subtree topological move (SSTM): if $\delta > p_i$ and/or $\delta > m_i$ but $\delta < h(\rho)-h(P_i)$ a topological rearrangement will occur, but will change only the subtree\footnote{The root $\rho$ has two children, $L$ and $R$, and if $P_i \neq \rho$ it is either one of them or the child of exactly one of $R$ or $L$.} that contains $P_i$.
+ \item Same subtree topological move (SSTM): if $\delta > p_i$ and/or $\delta > m_i$ but $\delta < h(\rho)-h(P_i)$ a topological rearrangement will occur, but will change only the subtree\footnote{The root $\rho$ has two children, $L$ and $R$, and if $P_i \neq \rho$ it is either one of $L$ and $R$ or the child of exactly one of $R$ or $L$.} that contains $P_i$.
  Similar to the above, a STM can be either ``complete'' or ``partial'', depending on the constraints imposed by $m_i$;
  \item Cross tree (topological) move (CTM): on the other hand if $\delta > h(\rho)-h(P_i)$ the destination set $\boldsymbol D_i(\delta)$ will only include destinations on the subtree across $i$ from the root.
  \end{enumerate}
 
 For a CSM $h^\prime$ is either $h(P_i) + \delta$ or $h(P_i) - \delta$  with probability $1/2$.
 The rationale above is valid even when $P_i$ is the root node, meaning the tree can be indefinitely extended above --\textit{i.e.} backwards in time\footnote{This does however require a bit of an abuse of notation, since the root does not have a parent node, but we would have to have $P_\rho = \rho$.}.
-If $\delta$ is $\delta > \max_{j} d(P_i, j)$ the height $h^\prime$ is bigger than the height of the root (tree height) and there will be no destinations on the opposite subtree.
+If $\delta > \max_{j} d(P_i, j)$ the height $h^\prime$ is bigger than the height of the root (tree height) and there will be no destinations on the opposite subtree.
 In this case, there is only one destination node, above the root, and the parent of $i$, $P_i$, becomes the root (see Figure~\ref{fig:stl}).
 This is in stark contrast with the default set of operators available in BEAST, where one needs a specific move to change the height of the root.
 As a trade-off however, \verb|STL| will only change the root height occasionally.
 
 An interesting property of \verb|STL| is that the scaling parameter $\sigma$ can be set in time units, which makes it easier to tune the parameter to be commensurate with the expected age of the root, for instance.
 This is particularly helpful when setting the initial value for $\sigma$ (before chain adaptation) if one has a rough guess of the evolutionary rate.
-Updating the root height is important because in phylodynamics as the height of the root carries information on the time of origin of the most recent common ancestor of the circulating lineages, and sometimes the epidemic (see e.g.~\cite{Gire2014}).
+Updating the root height is important because in phylodynamics the height of the root carries information on the time of origin of the most recent common ancestor of the circulating lineages, and sometimes the epidemic (see e.g.~\cite{Gire2014}).
 
 \subsection{The posterior distribution in Bayesian phylogenetics}
 \label{sec:prior_maths}
 
 Before analysing the properties of a~\verb|STL| (or \verb|STJ|) Markov chain in phylogenetic space, it would be convenient to study some properties of the target distribution $p(\cdot)$ in order to understand the challenges it poses to MCMC algorithms.
 
-Recall that $\boldsymbol\Psi = \mathbb{F} \times \mathbf{S}$,~\textit{i.e.}, phylogenetic space can be thought of as an infinite space composed of a finite discrete component of~\textit{topologies} $\mathbb{F}$, and a continuous space of inter-coalescent intervals $\mathbf{S}$ (branch lengths can also be used).
+Recall that $\boldsymbol\Psi = \mathbb{F} \times \mathbf{S}$,~\textit{i.e.}, phylogenetic space, is an infinite space composed of a finite discrete component of (fully-ranked)~\textit{topologies} $\mathbb{F}$, and a continuous space of inter-coalescent intervals $\mathbf{S}$ (branch lengths can also be used).
 Any analysis of Markov chains on this space needs to take into account the projection of the resulting measure on both spaces, as well as consider their interaction~\citep{Gavryushkin2016b}.
-\cite{Gavryushkin2016} claim about the MCMC on space of phylogenies:``mixing over these discrete structures is the primary obstruction to MCMC convergence'' (pg. 1102).
+For instance, one can analyse the projection of a random walk on $\boldsymbol\Psi$ by looking at the induced (marginal) random walk on $\mathbb{F}$, represented by the SPR graph (see Chapter 1).
+\cite{Gavryushkin2016} claim about the MCMC on space of phylogenies: ``mixing over these discrete structures is the primary obstruction to MCMC convergence'' (pg. 1102).
 While I do agree with the authors, it is also important to point out that the~\textbf{interaction} between branch lengths and topology may also play a role.
-The main purpose of the candidate-generating mechanisms proposed here is accounting for this interaction when proposing new states in the Markov chain.
+This is because even if $t$ and $\boldsymbol b$ are assumed independent~\textit{a priori}\footnote{A dubious assumption, made for computational tractability.}, they tend to inextrincably correlated~\textit{a posteriori}\footnote{The existence of a particular configuration of branch lengths $\boldsymbol b$ is defined only conditional on an underlying topology $t$.}.
+The main purpose of the candidate-generating mechanisms proposed here is to account for this interaction when proposing new states in the Markov chain.
 In this section I shall present some observations about the target distribution and its support $\boldsymbol\Psi$ in the same spirit as section 6.1 in~\cite{Dinh2017}, but with the goal of analysing the theoretical properties of phylogenetic transition kernels with special focus on the ones presented here.
 
-Under mild regularity conditions, the posterior is continuous and smooth up to the boundary of the BHV space; see~\cite{Dinh2017} for proofs.
+Under mild regularity conditions, the likelihood is continuous and smooth up to the boundary of the BHV space; see~\cite{Dinh2017} for proofs.
 This  property holds if the phylogenetic prior itself attains the property that it is smooth and continuous up the boundary~\citep[Assumption 2.3]{Dinh2017},
 which I show to be the case for parametric coalescent priors (see Equation~\ref{eq:coal_prior}).
 In general, any function $\mu : \boldsymbol S \times \boldsymbol K \to [0, \infty]$ such that $\sum_i\int_{\mathbb{R}^{2n-1}} \mu (\boldsymbol s, \boldsymbol k_i) d\boldsymbol s < \infty$ with $\frac{\partial \mu}{\partial \boldsymbol s} \in \mathcal{C}^1$  will fulfill these conditions.   
 
-Recall that the density under the parametric constant population coalescent is :
+Recall that the density under the parametric constant population coalescent is \cite[eq 5.1, pg. 81]{Drummond2002b}:
 \begin{equation}
 \label{eq:coal_prior_short} 
-\pi_0(\tau| N_e) \propto \exp\left(-\sum_{j=2}^{2n-1} k_j(k_j -1)(s_j - s_{j-1}) \right).
+\pi_0(\tau| N_e) = \frac{1}{N_e^{n-1}}\exp\left(-\frac{1}{(2N_e)^{2n-2}}\sum_{j=2}^{2n-1} k_j(k_j -1)(s_j - s_{j-1}) \right).
 \end{equation}
 
-It is clear that $\pi_0(\tau| N_e)$ is differentiable with respect to any of the random variables in the model ($\boldsymbol s$ and $\boldsymbol k$).
-In addition, inside the orthant, $\boldsymbol k$ does not change, hence the prior is  proportional to $\exp(-(s_i-s_{i-1}))$ for any $ i \in [2, \ldots, 2n-1]$ and thus a smooth function under the assumption of positive branch lengths.
-Notice also that the prior is separable, that is, $\pi_0(\tau| N_e) = \pi_1(t)\pi_2(\boldsymbol b)$.
+It is clear that $\pi_0(\tau| N_e)$ is differentiable with respect $\boldsymbol s$.
+In addition, $\boldsymbol k$ does not change inside the orthant, hence the prior is  proportional to $\exp(-(s_i-s_{i-1}))$ for any $ i \in [2, \ldots, 2n-1]$ and thus a smooth function under the assumption of positive branch lengths.
+% Notice also that the prior is separable, that is, $\pi_0(\tau| N_e) = \pi_1(t)\pi_2(\boldsymbol b)$.
 
 In order to study the properties of the prior (and by extension the posterior), let us now to make a few observations about phylogenetic space.
 \begin{remark}
@@ -322,7 +323,7 @@ As a consequence, any collection of fully-ranked phylogenies with this configura
 \end{proof}
 
 A statistical consequence of Remark~\ref{rmk:non_identifiable} is that the coalescent prior may fail to regularise any multimodality induced by the likelihood.
-In a way, the coalescent prior can be seen as an exchangeable prior on $\boldsymbol \Psi$.
+In a way, the coalescent prior can be seen as an exchangeable prior on $\boldsymbol \Psi$~\citep{Aldous1996}.
 Moreover, this prior is uniform on the space of ranked topologies, but induces counter-intuitive priors on individual clades~\citep{Pickett2005} complicating interpretations of posterior support for clades\footnote{In the interest of fairness, however, it must be said that a uniform distribution over clades is impossible under most prior measures~\citep{Steel2006}.}.
 Despite these caveats, the coalescent prior is very common in applications and hence I shall use it as prior measure on $\boldsymbol \Psi$.
 
@@ -351,10 +352,11 @@ In particular,
  \end{remark}
 \begin{proof}
 First, assume $h(i) > 0 \: \forall i \in V_t$ for any phylogeny $\tau \in \boldsymbol \Psi$ with topology $t$.
- Define $\mathcal{N}(x) = \{ u \in \mathbb{F} : d_{\text{SPR}}(u, x) = 1 \}$ as the \textit{neighbourhood} of $x \in \mathbb{F}$.
- Irreducibility is equivalent to stating $q_\sigma(y | x) > 0 \: \forall \: x, y \in \mathbb{F}$.
- Unfortunately, we cannot make this claim directly, because $q_\sigma(y | x) > 0$ only for $y \in \mathcal{N}(x)$, which is true because $\exists \: \delta^\star : P(x \rightarrow y | \delta^\star) > 0 $ and $\kappa(\delta^\star | \sigma) > 0 \: \text{for} \: \delta^\star > 0 \: \text{and} \: \sigma > 0$ by construction.
- Since the SPR graph is connected, it follows that any sequence of topologies $\boldsymbol X = \{ X^{(0)}, X^{(1)}, \ldots, X^{(N)}\}$ where $X^{(i + 1)} \in \mathcal{N}( X^{(i)})$ has positive probability under the transition kernel, establishing irreducibility in topological space.
+Recall that $d_{\text{SPR}}(u, x)$ is the number of SPR operations needed to transform $u$ into $x$ (section~\ref{sec:spr_stuff}, Chapter 1).
+Define $\mathcal{N}(x) := \{ u \in \mathbb{F} : d_{\text{SPR}}(u, x) = 1 \}$ as the \textit{neighbourhood} of $x \in \mathbb{F}$.
+ Ideally, we could show irreducibility if $q_\sigma(y | x) > 0$ for all $\: x, y \in \mathbb{F}$.
+ However, we cannot make this claim directly, because $q_\sigma(y | x) > 0$ only for $y \in \mathcal{N}(x)$, which is true because there exists $\: \delta^\star$ such that $P(x \rightarrow y | \delta^\star) > 0 $ and $\kappa(\delta^\star | \sigma) > 0 \: \text{for} \: \delta^\star > 0 \: \text{and} \: \sigma > 0$ by construction.
+ Since the SPR graph is connected (see Section~\ref{sec:spr_stuff} in Chapter 1), it follows that any sequence of topologies $\boldsymbol X = \{ X^{(0)}, X^{(1)}, \ldots, X^{(N)}\}$ where $X^{(i + 1)} \in \mathcal{N}( X^{(i)})$ has positive probability under the transition kernel, establishing irreducibility in topological space.
 %  (see also Remark~\ref{rmk:stl_K_irreducible}).
 \end{proof}
 
@@ -432,19 +434,28 @@ First, assume $h(i) > 0 \: \forall i \in V_t$ for any phylogeny $\tau \in \bolds
 
 \begin{theorem}
 \label{thm:stl_ergodic}
- SubTreeLeap induces an ergodic Markov chain on $\boldsymbol\Psi$ with respect to $\pi$. % LM: probably false....
+ SubTreeLeap induces an ergodic Markov chain on $\boldsymbol\Psi$ with respect to $p$. % LM: probably false....
 \end{theorem}
 \begin{proof}
  I will show that \verb|STL| is irreducible and aperiodic, which establishes ergodicity~\citep{Meyn1993,Roberts2004,Dinh2017}.
  First, we need to show irreducibility on $\boldsymbol\Psi$ by extending the result of Remark~\ref{rmk:stl_irreducible_F} to include branch lengths.
  Suppose there exist $\tau, \tau^\star \in \boldsymbol\Psi$ such that $\tau^\star$ cannot be reached from $\tau$ in finitely many \verb|STL| steps.
- Following Remark~\ref{rmk:stl_irreducible_F}, we may assume they have the same topology,~\textit{i.e.} $t = t^\star$, and that differences between the two phylogenies lie solely in their branch lengths.
+ Following Remark~\ref{rmk:stl_irreducible_F}, we may, withouth loss of generality, assume they have the same topology,~\textit{i.e.} $t = t^\star$, and that differences between the two phylogenies lie solely in their branch lengths.
  This would imply that there exist two phylogenies with the same topology that cannot be transformed into one another in finitely many sliding moves, which is clearly false.
  Note that \verb|STL| has a positive probability of producing a sliding move for any node it picks and all nodes (excluding the root) can be picked for any given \verb|STL| operation.
- Now, let us show that \verb|STL| is aperiodic.
- Let $r_\sigma(\tau)$ be the probability that $t = t^\prime$ and let $A = \{x : r_\sigma(x) > 0\}$.
- The chain is aperiodic on $\mathbb{F}$ because $ \pi(A) > 0 \: \forall \: A \subset \boldsymbol \Psi$ and $r_\sigma(\tau) > 0 \: \forall \: \tau $  -- according to~\cite{Tierney1994} (pg. 1705) this result can be found in Section 2.4 of~\cite{Nummelin1984}.
+ 
+ Now let us show that \verb|STL| is aperiodic.
+ Recall that $\tau  = (t, \boldsymbol b)$ and let $r_\sigma(\tau)$ be the probability that $t = t^\prime$ -- conditional on $\boldsymbol b$ -- and let $A = \{x : r_\sigma(x) > 0\}$.
+ The chain is aperiodic on $\mathbb{F}$ because $ p(A) > 0 \: \forall \: A \subset \boldsymbol \Psi$ and $r_\sigma(\tau) > 0 \: \forall \: \tau $  -- according to~\cite{Tierney1994} (pg. 1705) this result can be found in Section 2.4 of~\cite{Nummelin1984}.
+
  Aperiodicity with respect to branch lengths can be shown using a similar argument to the one used above for irreducibility.
+ We will use the concept of Harris recurrence~\citep{Harris1956,Chan1994,Tierney1994}.
+ First, denote the $n$-th state of the chain by $X^{(n)}$ and define $\kappa_A = \sup \{ n \geq 1 : X^{(n)} \in A \} $ for $A \subset \boldsymbol \Psi$.
+ Following the definitions and results in~\cite{Roberts2006}, for our purposes it suffices to show that $\text{Pr}(\kappa_A < \infty | X^{(0)} = x) = 1$ for all $x \in \boldsymbol \Phi$ -- since we know that $p(A) > 0$ for all $A$.
+ Again making use of Remark~\ref{rmk:stl_irreducible_F}, we may restrict attention to a family of (sub)sets $A_t = \{x : d_{\text{SPR}}(x, t) = 0 \}$ for some $t \in \mathbb{F}$.
+ Now one can use reasoning by contradiction similarly to what was done above to deduce that $\text{Pr}(\kappa_{A_t} = \infty | X^{(0)} = x) = 0$ for $x \in \boldsymbol \Phi$ and for all $t$.
+ If $d_{\text{SPR}}(x, t) = 0$ we use the sliding move argument above, otherwise we employ Remark~\ref{rmk:stl_irreducible_F} to get us to the case where it is.
+ These arguments establish Harris recurrence of the chain induced by \verb|STL| with respect to branch lengths, completing the proof.
 \end{proof}
 This establishes the suitability of \verb|STL| for use as the sole phylogenetic transition kernel in a MCMC analysis.
 
@@ -503,7 +514,7 @@ Hence, an approach routinely used in practice is look at the distribution of cla
 Recall that for $n \geq 3$ taxa there are $ A(n) = |\boldsymbol C| = 2^{n-1} -1$ possible clades. 
 As $n \rightarrow \infty$, $A(n)/F(n) \rightarrow 0$, making tracking clades instead of trees an attractive alternative when dealing with larger data sets commonly encountered in practice ($n$ in the lower hundreds).
 
-Comparing clade distributions can be done analogously to comparing tree (topology) distributions  -- as exemplified in Section~\ref{sec:cladeSwitch} Chapter 3, the probabilities can be computed exactly.
+Comparing clade distributions can be done analogously to comparing tree (topology) distributions  -- as exemplified in Section~\ref{sec:cladeSwitch} Chapter 3, the probabilities under the prior can be computed exactly.
 In particular one can define a similar error measure~\citep{Hoehna2008}:
 \[ \delta := \max_{1 \leq i \leq A(n)} \frac{|F^c_i - R^c_i|}{R^c_i}, \]
 where $\boldsymbol F^c$ and $\boldsymbol R^c$ are the true (theoretical) and observed probabilities as before.
@@ -513,7 +524,7 @@ where $\boldsymbol F^c$ and $\boldsymbol R^c$ are the true (theoretical) and obs
 In addition to looking at topologies, we also need to ensure the distribution of branch lengths is being accurately sampled.
 To this end, we can look at the distribution of coalescent intervals.
 Under a constant population size ($N_e$) coalescent model, the $k-$th coalescent interval is distributed according to an exponential($\lambda_k$), where $\lambda_k = \frac{k(k-1)}{4N_e}$, $k = 1, 2, ..., n-1$.
-With this at hand, one can then analyse a sample of trees and assess whether the empirical (observed) distribution of coalescent times matches the theoretical distribution.
+With this in hand, one can then analyse a sample of trees and assess whether the empirical (observed) distribution of coalescent times matches the theoretical distribution.
 For instance, one can perform a goodness-of-fit test to ascertain whether the distribution sampled~\textit{via} MCMC adheres to its theoretical counterpart.
 
 \subsubsection{Dealing with data: marginal likelihoods}
@@ -542,8 +553,8 @@ Figure~\ref{fig:treeP} shows that all tested kernels are able to approximate the
 These results suggest that the moves proposed here correctly lead to the target the distribution of interest in terms of tree topologies and clades.
 An attentive reader will notice we plot $5\%$ bands for the tree comparisons and $1\%$ bands for the clade comparisons. 
 This is because estimation for clade probabilities is much more precise then for tree probabilities.
-These thresholds are inherently arbitrary and we feel $5\%$ is an acceptable threshold.
-We draw attention to the fact that our error measures are \textbf{relative}, whereas other authors have chosen absolute error loss functions~\citep{Hoehna2008, Lakner2008}.
+These thresholds are inherently arbitrary and I feel $5\%$ is an acceptable threshold.
+I draw attention to the fact that the error measures discussed here are \textbf{relative}, whereas other authors have chosen absolute error loss functions~\citep{Hoehna2008, Lakner2008}.
 In practice this means our thresholds are more strict than previously adopted.
 
 Next, I look at the estimates of the coalescent intervals.
@@ -587,8 +598,8 @@ Colours show the three possible tree shapes for $5$ taxa.
 \centering
 \includegraphics[scale=0.75]{\dir/figs/CladeFrequencies_5taxa.pdf}
 \caption[Clade probabilities obtained by sampling from the prior with each transition kernel.]{\textbf{Clade probabilities obtained by sampling from the prior with each transition kernel}.
-We used the same sample of $1$ million trees to compute clade frequencies to compute the clade frequencies.
-On the x-axis, we present the true clade probabilities, computed from a the same sample from the prior as before.
+I used the same sample of $1$ million trees to compute clade frequencies to compute the clade frequencies.
+On the x-axis, I present the true clade probabilities, computed from a the same sample from the prior as before.
 Probabilities estimated using the default mix of kernels in BEAST v.1.8.4 are again provided in the top panel.
 Solid line shows $x=y$ and the dashed lines show $1\%$ limits.
 Colours show the three possible clade sizes for $5$ taxa (excluding singletons and the set of all leaves/tips).
@@ -604,7 +615,7 @@ Colours show the three possible clade sizes for $5$ taxa (excluding singletons a
   \subfigure[\textbf{SubTreeLeap}]{\includegraphics[scale=0.4]{\dir/figs/coalInts_SubTreeLeap.pdf}}
 \end{center}
 \caption[Coalescent interval distributions obtained by direct simulation, the default (standard) mix of operators in BEAST and our two new kernels.]{\textbf{Coalescent interval distributions obtained by direct simulation, the default (standard) mix of operators in BEAST and our two new kernels}.
-We show the distributions of the four coalescent intervals for $n = 5$ and $N_e = 1000$  obtained by (a) direct simulation from the coalescent process, (b) sampling with the default mix of operators (kernels), (c) SubTreeJump and (d) SubTreeLeap.
+I show the distributions of the four coalescent intervals for $n = 5$ and $N_e = 1000$  obtained by (a) direct simulation from the coalescent process, (b) sampling with the default mix of operators (kernels), (c) SubTreeJump and (d) SubTreeLeap.
 Red and black vertical dashed lines show the theoretical and estimated means, respectively, and the solid red line shows the theoretical density. 
 To be able to sample with SubTreeJump, we need to combine it with branch length transition kernels, whilst SubTreeLeap can sample on its own.}
 \label{fig:coalIntervals}
@@ -614,7 +625,7 @@ To be able to sample with SubTreeJump, we need to combine it with branch length 
 \centering
 \includegraphics[scale=0.75]{\dir/figs/NE_ratioP_vs_ratioMargLike_40L_1Biter.pdf}
 \caption[Log posterior probabilities versus marginal (log) likelihoods.]{\textbf{Log posterior probabilities versus marginal (log) likelihoods}.
-We plot $\log P_i - \log P_j$ against $(\log l_i - \log l_j) + (\log \pi(T_i) - \log\pi(T_j)$ for the default mix and SubTreeLeap.
+I plot $\log P_i - \log P_j$ against $(\log l_i - \log l_j) + (\log \pi(T_i) - \log\pi(T_j))$ for the default mix and SubTreeLeap.
 Points are coloured according to their rspr distance to the true tree.
 Notice that distance zero means the true tree, used to be simulate the data.
 }
@@ -626,7 +637,7 @@ Notice that distance zero means the true tree, used to be simulate the data.
 \centering
 \includegraphics[scale=0.75]{\dir/figs/ratioP_vs_ratioMargLike_40L_1Biter.pdf}
 \caption[Ratios of posterior probabilities of the trees against the ratio of their marginal likelihoods.]{\textbf{Ratios of posterior probabilities of the trees against the ratio of their marginal likelihoods.}
-In this figure we show the (log) ratios as proposed by~\cite{Hoehna2008}.
+In this figure I show the (log) ratios as proposed by~\cite{Hoehna2008}.
 All computations as in Figure~\ref{fig:logP}.
 Solid black line shows $x = y$.
 Point shapes depict the distance between the pair of trees.
@@ -645,21 +656,21 @@ Data sets \verb|Dengue4|, \verb|RSVA| and \verb|YFV| are widely used in phylodyn
 These data sets also have moderate numbers of sequences, which permit better exploration of available methods by allowing more -- and longer -- chains to be run.
 To assess performance in bigger, more realistic data sets I composed three more collections of RNA virus sequence alignments, described below.
 
-To compose \verb|denv2Env|, I downloaded  $2382$ full genomes (aligned) from Broad Institute's Dengue Virus Portal (\url{http://www.broadinstitute.org/annotation/viral/Dengue/}), filtered those from serotype 2 and then subsampled to have at most five samples from each year.
+To compose \verb|denv2Genome|, I downloaded  $2382$ full genomes (aligned) from Broad Institute's Dengue Virus Portal (\url{http://www.broadinstitute.org/annotation/viral/Dengue/}), filtered those from serotype 2 and then subsampled to have at most five samples from each year.
 This resulted in a data set consisting of $90$ full genome from DENV-2 isolates from the Americas, ranging from 1987 to 2007.
-\verb|denv2Genome| was constructed by selecting only the envelope sequence for each of the full genomes.
+\verb|denv2Env| was constructed by selecting only the envelope sequence for each of the full genomes.
 Sequences were downloaded pre-aligned.
-
-I downloaded all HIV subtype B polymerase (pol) gene sequences from the Los Alamos HIV sequence database~(\url{http://www.hiv.lanl.gov/content/sequence/HIV/mainpage.html}) and retained those with known sampling year.
-This data set comprised $2523$ sequences, with sampling years in the period $1983-2013$.
-Downsampling was carried out in the same fashion of that for Influenza by keeping the $39$ unique sequences from $1983$ and sampling from subsequent years, resulting in $187$ sequences in the final data set (\verb|HIV|)\footnote{The sequences were downloaded pre-aligned and the final alignment was manually checked for inconsistencies.}.
 
 \verb|flu| is comprised of Human Influenza H3N2 hemagglutinin (HA) sequences ($\approx 1700$ bp).
 I downloaded all human HA sequences with more than $1700$ base pairs from the Influenza Research Database~(\url{http://www.fludb.org/brc/home.spg?decorator=influenza}), totalling $8455$ sequences, with sampling dates ranging from $1969$ to $2014$. 
 To make analyses feasible, I downsampled by including at most five sequences from each subsequent year were randomly sampled, resulting in a final data set comprised $225$ sequences, which were then aligned by codons using the Geneious software package~(\url{http://www.geneious.com/}).
 
-Finally,~\verb|EBOVa| is one of the largest phylodynamic data sets assembled to date, composed of 1610 serially-sampled full genome sequences of Ebola virus, curated by~\citep{Dudas2017}.
-In order to speed up computations without however losing realism, I consider a modified version of the data set without the intergenic regions (\verb|EBOVb|).
+I downloaded all HIV subtype B polymerase (pol) gene sequences from the Los Alamos HIV sequence database~(\url{http://www.hiv.lanl.gov/content/sequence/HIV/mainpage.html}) and retained those with known sampling year.
+This data set comprised $2523$ sequences, with sampling years in the period $1983-2013$.
+Downsampling was carried out in the same fashion of that for Influenza by keeping the $39$ unique sequences from $1983$ and sampling from subsequent years, resulting in $187$ sequences in the final data set (\verb|HIV|)\footnote{The sequences were downloaded pre-aligned and the final alignment was manually checked for inconsistencies.}.
+
+Finally,~\verb|EBOVa| is one of the largest phylodynamic data sets assembled to date, composed of 1610 serially-sampled full genome sequences of Ebola virus, curated by~\cite{Dudas2017}.
+In order to speed up computations without losing realism, I consider a modified version of the data set without the intergenic regions (\verb|EBOVb|).
 I spend a considerable portion of this chapter discussing ways of improving MCMC performance for data sets \verb|EBOVa| and \verb|EBOVb|, since they represent the type of challenging data set that is quickly becoming the norm in phylodynamics.
 
 \begin{sidewaystable}[!ht]
@@ -694,8 +705,8 @@ At each iteration BEAST picks a transition kernel (operator) at random from the 
 An~\textbf{operator mix} thus is a collection of transition kernels with a certain vector of weights $\boldsymbol w$.
 For the experiments presented in this chapter I have constructed five MCMC schemes employing different candidate-generating mechanisms (operators), described in detail in Table~\ref{tab:operator_mixes}.
 I compared the default suite of operators in BEAST~\citep{Drummond2012} to schemes containing \verb|FNPR|,~\verb|STJ|,~\verb|STL| and a combination of~\verb|STJ| and \verb|STL|, which I dubbed~\verb|STX|.
-Notice that when employing either~\verb|FNPR| or~\verb|STJ| I needed to also include ways of updating branch lengths, since these operators promote only topology changes.
 The idea behind combining~\verb|STJ| and \verb|STL| was to help the chain make bigger jumps occasionally, since for $\alpha \geq 0$~\verb|STJ| can lead to bold proposals and hence help with mode-jumping (see Section~\ref{sec:STJadap} however).
+Notice that when employing either~\verb|FNPR| or~\verb|STJ| I needed to also include ways of updating branch lengths, since these operators promote only topology changes.
 
 \begin{sidewaystable}[!ht]
 \caption[Operator mixes used in this study.]{\textbf{Operator mixes used in this study}.
@@ -721,10 +732,56 @@ SubtreeLeap and SubtreeJump (\verb|STX|) & \verb|subTreJump| (63), \verb|subTreL
  \label{tab:operator_mixes}
 \end{sidewaystable}
 
+\subsection{Adaptation scheme}
+
+The efficiency of $\bar{\mu_g}$ as an estimator depends crucially on the proposal-generating distribution $Q_\omega(\cdot, \cdot)$, which in turn depends on the indexing parameter $\omega$.
+In general, $\omega$ can be understood as the~\textit{width} of the proposal; if $\omega$ is too small, consecutive states will be highly correlated, and the chain will not mix well.
+On the other hand, if $\omega$ is too large, proposed values are likely to have low density under the target and hence get rejected.
+Ideally, one would want to set $\omega$ to an optimal value $\omega^\star$ that maximises the efficiency of chain, as measured by, say, the effective sample size (ESS).
+In particular, we would like to find $\omega^\star$ such that the acceptance probability $\alpha$ is at its optimal value, $\alpha^\star$.
+Theoretical analyses of a host of MCMC algorithms for a broad class of target distributions have shown that $\alpha^\star \approx 0.234$ ($0.44$ for one-dimensional targets) for random walk Metropolis~\citep{Roberts1997,Roberts2001}, $0.574$ for the Metropolis-adjusted Langevin algorithm (MALA)~\citep{Roberts2001} and $0.651$ for Hamiltonian Monte Carlo (HMC)~\citep{Beskos2013}.
+
+It is convenient to represent the accept-reject mechanism as a binary-valued process with probability $\alpha_\omega$.
+In particular, we can write~\citep{Andrieu2008}:
+$$\bar{\alpha}_\omega := \int_{\mathcal{X} \times \mathcal{X}} \alpha_\omega(x, y)\pi_d(x) q_\omega(x, y) dxdy.$$
+Recall that in parallel to the chain $\{Z_i\}$ we have a chain of proposed values $\{Y_i\}$.
+We can formulate the problem of finding $\bar{\alpha}_\omega = \alpha^\star$ as an stochastic approximation problem, more specifically, we can can write~\cite[eq. 17]{Andrieu2008}:
+$$ h(\omega) := E_\omega[ H(\omega, Z_0, Y_1, Z_1, \ldots) ] = 0,$$
+where
+$$ H(\omega, Z_0, Y_1, Z_1, \ldots) :=  \min \left[1, \frac{\pi_d(Y_1) q_\omega(Y_1, Z_0)}{\pi_d(Z_0) q_\omega(Z_0, Y_1)} \right] - \alpha^\star.$$
+This is the so-called \textbf{coerced} acceptance probability case, which is is implemented in BEAST.
+It is equivalent to finding the zeroes of $h(\omega) = \bar{\alpha}_\omega- \alpha^\star$~\citep{Andrieu2008}.
+
+I shall follow~\cite{Garthwaite2016} and assume that the acceptance probability $\bar{\alpha}_\omega$ is a monotonically-decreasing function of the scale parameter.
+The Robbin-Monro algorithm~\citep{Robbins1951} is a popular method for solving the zero-finding problem and consists of creating a positive, non-increasing sequence $\{ \omega_i \}$, $\omega_i: \Omega \times \mathcal{X} \to \Omega$ via an update of the form~\cite[eq. 21]{Andrieu2008}
+\begin{equation}
+ \label{eq:general_size_update}
+ \omega_{n + 1} = \omega_n + \gamma_{n + 1}h(\omega),
+\end{equation}
+subject to the conditions that $\sum_{n = 0}^\infty \gamma_n = \infty$ and $\sum_{n = 0}^\infty \gamma_n^2 < \infty$.
+One way to attain this is to choose $\gamma_n = \mathcal{O}(n^{-c})$ for $1/2 < c \leq 1$~\citep{Atchade2005}.
+In practice, we need to replace $h(\omega)$ with an estimate, for instance
+\begin{align*}
+\widehat{h}(\omega) &:=  \widehat{\alpha(\omega)}_n - \alpha^\star, \\
+\widehat{\alpha(\omega)}_n &:= \sum_{j = C_0}^n  \alpha_{\omega_j}(Z_j, Y_j),
+% \widehat{\alpha(\omega)}_n &:= \sum_{j = C_0}^n 1-\mathbb{I}_{Z_j}(Y_j).
+\end{align*}
+% $\mathbb{I}_z(y)$ is 1 when $y = z$ and $0$ otherwise 
+where $C_0$ is an integer constant chosen so as to avoid transient effects from the initial states of the chain. 
+In BEAST, the Robbins-Monro update is of the form\footnote{Notice that in BEAST the acceptance rate estimate is~\textbf{not} smoothed over the chain.}
+\begin{equation}
+ \label{eq:beast_size_update}
+ \omega_{n + 1} = \omega_n + \frac{1}{f(n) + 1} \left( \alpha_{\omega_n}(Z_n, Y_n) - \alpha^\star\right)
+\end{equation}
+where $f(x) = x$, $f(x) = \log(x)$ or $f(x) = \sqrt{x}$.
+By default $f(x) = \log(x)$ and $C_0 =  \left \lfloor{M/100}\right \rfloor$.
+Unfortunately, however, it is not clear to me how $f(x) = \log(x)$ could lead to a valid algorithm, since\footnote{Notice also that $\sum_{n = 0}^\infty \left( \frac{1}{\sqrt{n} + 1}\right)^2 = \infty$.} $\sum_{n = 0}^\infty \left( \frac{1}{\log(n) + 1}\right)^2 = \infty$.
+In contrast, $\sum_{n = 0}^\infty \left( \frac{1}{n + 1}\right)^2 = \frac{\pi^2}{6}$.
+
 \subsection{Golden runs}
 \label{sec:golden_runs}
 
-Since we do not know the true posterior distribution for any of the empirical data sets described in Section~\ref{sec:realworld}, I ran very long chains for each data set in order to obtain what we will call ``golden runs'', which intend to be a good approximation to the actual target distributions.
+Since we do not know the true posterior distribution for any of the empirical data sets described in Section~\ref{sec:realworld}, I ran very long chains for each data set in order to obtain what we will call ``golden runs'', which are intended to be a good approximation to the actual target distributions.
 To obtain these golden runs I ran three independent chains for $10^9$ iterations using the default kernels (see above).
 I extracted the last $5, 000$ phylogenies from each run and (i) obtained a maximum clade credibility (MCC) tree from the resulting $15, 000$ trees and (ii) computed the $2.5 \times 10^6$ pairwise distances between them under various metrics in order to then obtain MDS projections (see Chapter 3).
 I will call these the ``true tree'' and ``true posterior'', respectively.
@@ -759,7 +816,7 @@ This radius,~\textit{i.e.} the size of the typical set, depends on the metric ($
 The fraction $p_t$ is a measure of how quickly the chain reaches the typical set.
 A univariate measure of performance could then be to take the maximum value of this fraction across metrics -- thus being conservative.
 
-Finally, one can study the warm-up time by considering what fraction $p_w$ the chain one needs to discard in order to achieve maximum ESS for the continuous parameters.
+Finally, one can study the warm-up time by considering what fraction $p_w$ the chain one needs to discard in order to achieve maximum ESS\footnote{One can see ESS as a concave function of $p_w$; too small $p_w$ and ESS will be low due to the transient effect of initial iterations (high autocorrelation); too high $p_w$ and one discards too many samples, bounding ESS above.} for the continuous parameters.
 This is done as follows: for a given chain, the~\textbf{ optimal warm-up fraction}, $\hat{p_w}$, is the maximum fraction fraction of the chain one needs to discard in order to obtain the maximum ESS for a given parameter, across all parameters of interest.
 Here I have chosen the parameters \verb|prior|, \verb|likelihood|, \verb|posterior|, \verb|treeModel.rootHeight|, \verb|treeLength|, \verb|meanRate|, \verb|CP1.kappa|, and  \verb|CP3.alpha| because they represent the type of continuous parameter a practitioner would be interested in estimating.
 
@@ -784,14 +841,14 @@ In Figure~\ref{fig:target_golden} I show the distributions of distance to the tr
 Even in this univariate setting the target distribution can be multimodal and generally non-standard, for most metrics considered.
 Discrete metrics such as the RF show multiples peaks as expected, since RF for instance can only take values in $\boldsymbol D_{\text{RF}} = \{0, 1, \ldots, 2(n-3) \} \in \mathbb{N} $.
 In Figure~\ref{fig:target_golden}A I show that these distributions however look well-behaved, resembling Poisson distributions~\citep{Bryant2009}.
-The distributions for~\verb|denv2Env| and \verb|denv2Genome| seem to be translated versions of one another, with the target for \verb|denv2Env| having lower variance as expected under regularity conditions (more data, less uncertainty about the central tree). 
-Interestingly, the targets for KC metric with $\lambda = 0$ (Figure~\ref{fig:target_golden}B)  which reflect topological differences only display very different behaviour, displaying at the same time less granularity and multimodality.
+The distributions for~\verb|denv2Env| and \verb|denv2Genome| seem to be translated versions of one another, with the target for \verb|denv2Genome| having lower variance as expected under regularity conditions (more data, less uncertainty about the central tree). 
+Interestingly, the targets for KC metric\footnote{see Chapter 3 for definitions of this and other metrics.} with $\lambda = 0$ (Figure~\ref{fig:target_golden}B)  which reflect topological differences only display very different behaviour, displaying at the same time less granularity and multimodality.
 While being somewhat obvious, this result does in fact suggest that multiple metrics, even when designed to capture the same features -- in this case differences in tree topology -- can lead to radically different results (see discussion in Chapter 3 for more).
 
 As expected, focusing on continuous distance metrics that take both topology and branch lengths into account reveals distributions that resemble strictly positive continuous targets encountered routinely in Statistics (e.g. the log-normal distribution).
 The Steel-Penny (SP) metric seems to lead to target distributions that more closely resemble univariate continuous target distributions; it is unimodal and smooth, albeit with considerable skewness.
 Notable exceptions are the distributions of SP distances for~\verb|denv2Genome|, which presents some clearly defined minor modes (Figure~\ref{fig:target_golden}C, lower left subpanel) and the distributions under the CD metric, shown in~Figure~\ref{fig:target_golden}D.
-This is interesting  because the resulting target for a subset of \verb|denv2Genome|, namely \verb|denv2Env|, does not display these features, providing evidence that multimodality may be strongly data driven -- hence manifesting in some data sets or subsets thereof but not others.
+This is interesting  because the resulting target for a subset of \verb|denv2Genome|, namely \verb|denv2Env|, does not display these features, providing evidence that multimodality may be strongly data set specific -- hence manifesting in some data sets or subsets thereof but not others.
 The same pattern of the full data set presenting more modes than a subset can be seen in the lower left subpanel of Figure~\ref{fig:target_golden}B, which shows results under the KC metric with $\lambda = 0$  (topology differences only).
 Distributions of the rooted branch distance (BS) to the true tree show comparable levels of smoothness (Figure~\ref{fig:target_golden}E).
 In the following sections I will use these target distributions to evaluate the empirical performance of various MCMC schemes (see Section~\ref{sec:performance_methods} for methods).
@@ -841,13 +898,13 @@ These are shown in Figure~\ref{fig:fractions_metrics}.
 The first thing to notice is that for most MCMC schemes (operator mixes), only relatively few iterations, under $1\%$ of the total chain length, are required for the chain to start sampling from the bulk of the target distribution.
 \verb|STL| and \verb|STX| showed more difficulty reaching the typical set when compared to the default set of operators.
 These results are consistent across the two data sets analysed, but the differences in performance are less pronounced for the bigger data set, DENV-2 (90 taxa).
-Combining \verb|STJ| and \verb|STL| into \verb|STX| improves warm-up quite substantially, even though it does not beat the default operators.
+Combining \verb|STJ| and \verb|STL| into \verb|STX| improves warm-up quite substantially, even though it does not outperform the default operators.
 This is in tune with the results for the Ebola 1610 taxa data set, for which~\verb|STX| showed faster convergence compared to \verb|STL| (see extended discussion).
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.6]{\dir/figs/metrics_opt_warmup.pdf} 
 \end{center}
- \caption[Fraction $p_t$ of the chain needed to hit the typical set for several MCMC schemes and tree metrics.]{\textbf{Fraction $p_t$ of the chain needed to hit the typical set for several MCMC schemes and tree metrics.}
+ \caption[Fraction $p_t$ of the chain needed to hit the typical set (95\% CI) for several MCMC schemes and tree metrics.]{\textbf{Fraction $p_t$ of the chain needed to hit the typical set for several MCMC schemes and tree metrics.}
   Boxplots show the results of $100$ replicates per data set.
   Vertical tiles show different metrics and horizontal ones show different data sets.
   The dotted line shows a fraction of $1\%$ 
@@ -889,7 +946,7 @@ The next step was to look at the effective sample size of the distance to the tr
 This approach is similar to that of~\cite{Lanfear2016}, who call the ESS of the distance to a focal tree the ``pseudo ESS''.
 The main difference is that here I take an MCC tree obtained from three very long (golden) runs as focal tree, instead of the first tree of the chain.
 From Figure~\ref{fig:ESS_distance_true} we can see that while \verb|STL| displays better performance than the default scheme, the combination of \verb|STJ| and \verb|STL| (\verb|STX|) has the best performance in terms of the effective sample size of the distance to the true tree\footnote{Recall these are  MCC trees obtained from three separate golden runs.}.
-This result seems to be consistent also for simulated data (see Figure~\ref{sfig:ess_true_50taxa}).
+This result seems to be consistent also for simulated data (see Figure~\ref{sfig:ess_true_50taxa} in Appendix B).
 It seems also that as tree size grows the scaling of \verb|STX| becomes more important, as evidenced by some of the ESS from the default set of operators being below the common threshold of $200$ for some metrics (e.g. the KC metric with $\lambda = 0$).
 If the one-dimensional projections of phylogenetic space provided by the target distributions shown in~\ref{fig:target_golden} are taken to be faithful representations of the original space then the results above indicate that \verb|STL| and \verb|STX|  allow more efficient sampling, not only in terms of distance to the true tree but also in number of effective samples per MCMC iteration.
 
@@ -905,7 +962,7 @@ If the one-dimensional projections of phylogenetic space provided by the target 
  \label{fig:ESS_distance_true}
 \end{figure}
 
-To further study performance in phylogenetic space, I analysed mixing in clade (bipartition) space.
+To further study performance in phylogenetic space, I analysed mixing in clade space.
 The results in Figure~\ref{fig:mixing_clades} show several measures of performance, with panels A and B showing the rate of switching of clade absence/presence indicators (see Chapter 3, section~\ref{sec:cladeSwitch}) while panels C and D show the effective sample size of these clade indicators.
 In theory, these measures should agree, since they are essentially measuring how quickly the chain explores clade space by visiting each clade proportional to its posterior probability; the faster the switching rate, the higher the ESS (see section~\ref{sec:cladeSwitch} in Chapter 3 for a discussion).
 And we see that these quantities do agree and show that \verb|STL| and \verb|STX|  outperform the other schemes, specially for the larger data set.
@@ -921,6 +978,7 @@ On the other hand, the plots in Figure~\ref{fig:mixing_clades}E show that the tw
   Panel A shows the average clade switching score (see Chapter 3 for definitions), while panel B shows the minimum -- across clades -- switching score.
   Panels C and D show the minimum and average ESS for the clade indicators, respectively.
   Panel E shows the total number of clades visited in a run of 10 (DENV-4, 17 taxa) or 20 (DENV-2, 90 taxa) million iterations with a sample of $10, 000$  phylogenies.
+  Please note that y-axes differ between plots.
   }
  \label{fig:mixing_clades}
 \end{figure}
@@ -928,8 +986,8 @@ On the other hand, the plots in Figure~\ref{fig:mixing_clades}E show that the tw
 While performance in phylogenetic space is the focus in this chapter, the ability to quickly traverse the space is also important regarding performance for other parameters that depend on the underlying phylogeny, such as growth and evolutionary rates.
 I show that~\verb|STL| and~\verb|STX| can also facilitate the sampling of important continuous parameters that are dependent on the phylogeny, such as the mean evolutionary rate (\verb|meanRate|).
 Figure~\ref{fig:continuous_ESS} shows the effective sample size for two continuous parameters: the mean evolutionary rate and the Gamma heterogeneity parameter $\alpha$  (\verb|CP3.alpha|) for the third codon partition.
-While the evolutionary rate depends on all branch lengths and rate assignments over the tree and thus constitutes a hard parameter to sample, \verb|CP3.alpha| has very little dependence on the phylogeny (and other parameters in the model) and thus the chain usually converges quite fast for this parameter.
-The results show that while all MCMC schemes (operator mixes) perform comparably for \verb|CP3.alpha|,~\verb|STL| and~\verb|STJ| show improved performance for \verb|meanRate|.
+While the evolutionary rate depends on all branch lengths and rate assignments over the tree and thus constitutes a hard parameter to sample, \verb|CP3.alpha| has very little dependence on the phylogeny (and other parameters in the model) and thus the chain usually converges quite quickly for this parameter.
+The results show that while all MCMC schemes (operator mixes) perform comparably for \verb|CP3.alpha|,~\verb|STL| and~\verb|STJ| have improved performance for \verb|meanRate|.
 
 I first looked at the fraction of the chain that, when removed as warm-up (burn-in), maximises the ESS, for a selection of continuous parameters (see Section~\ref{sec:performance_methods}), taking the maximum fraction across parameters as the measure for a particular run -- again, a conservative performance assessment.
 The results are shown in Figure~\ref{fig:optimal_burnin} and reveal a slight advantage for \verb|STL| and \verb|STX| for the larger data set (DENV-2, 90 taxa).
@@ -990,8 +1048,8 @@ Investigating ways of cleverly setting initial values for the tuning (scaling) p
 The findings in Section~\ref{sec:multimod} suggest that, in terms of the tuning parameter, the difference between a run that never finds a higher mode (run 3) and one that eventually does (run 2) is very small.
 On the other hand, a bigger size such as the one attained by run 1 offers some protection against getting stuck at a lower mode, as expected.
 
-The findings of Figures~\ref{fig:mixing_clades}E and~\ref{fig:fractions_metrics} when taken together, seem to suggest that the inability of \verb|STX| to explore more clades (hence topologies) in the beginning of the chain could be the reason for larger warm-up times.
-The adaptive nature of \verb|STL| means that it might sometimes get stuck on a mode because its size has been tuned for optimal sampling of that mode and larger jumps which are necessary for it to traverse the 
+The findings of Figures~\ref{fig:mixing_clades}E and~\ref{fig:fractions_metrics} when taken together, seem to suggest that the inability of \verb|STX| to explore more clades -- and hence, potentially, more topologies -- in the beginning of the chain could be the reason for larger warm-up times.
+The adaptive nature of \verb|STL| means that it might sometimes get stuck on a mode because its size has been tuned for optimal sampling of that mode and larger jumps which are necessary for it to traverse the space between modes.
 I hypothesise that the ability of the default operator mix and \verb|STX| to traverse phylogenetic space is conferred by non-tunable, bold transition kernels such as \verb|WideExchange| in the case of the default mix and \verb|SubtreeJump| in the case of \verb|STX|.
 These may lead to big tree rearrangements and hence serve as crude mode-jumping kernels.
 Crude in the sense that they are agnostic about the number and nature of the modes and hence lead to mode-jumping only occasionally and at random.
@@ -1002,7 +1060,7 @@ It is in principle possible to design more guided candidate-generating mechanism
 \label{sec:performance_discussion}
 
 Overall, the new schemes proposed in this chapter showed better performance, not only in phylogenetic space but also for continuous parameters of interest.
-In particular, combining \verb|STJ| and \verb|STL| (\textit{i.e.} \verb|STX|) seems to prevent pathological behaviour of getting stuck at lower modes while improving performance in a consistent manner.
+In particular, combining \verb|STJ| and \verb|STL| (\textit{i.e.} \verb|STX|) seems to prevent the pathological behaviour of getting stuck at lower modes while improving performance in a consistent manner.
 These findings therefore point towards \verb|STX| as a more efficient MCMC scheme, in particular for larger data sets.
 In most analyses, performance gains were bigger for the larger data set (DENV-2, 90 taxa).
 Additionally, \verb|STX| considerably outperformed the default scheme for a challenging data set in the form of the EBOV data set which is comprised of 1610 full genomes.
